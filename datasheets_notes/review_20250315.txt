@@ -1,0 +1,4 @@
+2025-03-15 datasheet facts referenced:
+- HX711 (datasheets/hx711.pdf): FS input at AVDD=5 V is ±20 mV (Gain 128), ±40 mV (Gain 64), ±80 mV (Gain 32). Scales with supply; at 3.3 V Gain 32 range is ±52.8 mV.
+- FX1901 (datasheets/ENG_DS_FX19_A13.pdf): FS output 16–24 mV/V (nominal 20 mV/V). At 3.3 V excitation, nominal FS ≈66 mV. Input resistance 2.4–3.6 kΩ; operating temp 0–50 °C.
+- RAK3172 (datasheets/rak3172_datasheet.md): Supply range 2.0–3.6 V (no 3.9 V abs max documented).

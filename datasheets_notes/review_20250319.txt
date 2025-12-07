@@ -1,0 +1,6 @@
+2025-03-19 datasheet references:
+- HX711 (hx711.pdf): FS inputs at AVDD=5 V ±20 mV (Gain 128), ±40 mV (Gain 64), ±80 mV (Gain 32); scales with supply, so at 3.3 V Gain 32 range is ±52.8 mV.
+- FX1901 (ENG_DS_FX19_A13.pdf): nominal 20 mV/V (16–24 mV/V). At 3.3 V excitation FS ≈66 mV; input resistance 2.4–3.6 kΩ; operating temp 0–50 °C.
+- ESP32-S3-WROOM-1 (esp32-s3-wroom-1_wroom-1u_datasheet_en.pdf): 3.0–3.6 V supply; typical current profiles per datasheet. Used in Plan B gateway.
+- W5500 (W5500_datasheet_v1.0.2_1.pdf): 3.3 V supply; SPI Ethernet controller. Used in Plan B gateway.
+- RAK5146: only a URL present (RAK5146.url); no PDF in `datasheets/`, so concentrator specs not validated here.

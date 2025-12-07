@@ -1,0 +1,38 @@
+RAK3172 datasheet pin summary (source: https://docs.rakwireless.com/product-categories/wisduo/rak3172-module/datasheet/)
+
+Supply:
+- VDD 2.0–3.6 V (Absolute Max 3.9 V per datasheet Electrical Characteristics)
+
+Pin table (number : name / primary function):
+1  PA3 / UART2_RX
+2  PA2 / UART2_TX
+3  PA15 / GPIO, ADC-capable
+4  PB6 / UART1_TX
+5  PB7 / UART1_RX
+6  PA1 / GPIO only
+7  PA13 / SWDIO (reserved)
+8  PA14 / SWCLK (reserved)
+9  PA12 / I2C_SCL, GPIO
+10 PA11 / I2C_SDA, GPIO
+11 GND
+12 RF (no-IPEX variant only)
+13 PA7 / SPI1_MOSI
+14 PA6 / SPI1_MISO
+15 PA5 / SPI1_CLK
+16 PA4 / SPI1_NSS
+17 GND
+18 GND
+19 PA8 / GPIO
+20 PA9 / GPIO
+21 BOOT0
+22 RST (NRST)
+23 GND
+24 VDD
+25 PA10 / GPIO, ADC-capable
+26 PB2 / GPIO, ADC-capable
+27 PB12 / GPIO (with internal pull up for HF variant, pull down for LF variant)
+28 GND
+29 PA0 / GPIO only
+30 PB5 / GPIO only
+31 PB4 / GPIO, ADC-capable
+32 PB3 / GPIO, ADC-capable

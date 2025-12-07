@@ -1,0 +1,3 @@
+/Users/zongbaolu/work/weight_m/firmware/build/CMakeFiles/UrineMonitor.elf.dir
+/Users/zongbaolu/work/weight_m/firmware/build/CMakeFiles/edit_cache.dir
+/Users/zongbaolu/work/weight_m/firmware/build/CMakeFiles/rebuild_cache.dir

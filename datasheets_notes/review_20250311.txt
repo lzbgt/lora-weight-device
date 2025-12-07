@@ -1,0 +1,8 @@
+2025-03-11 quick facts reused from prior pulls (see earlier notes) for doc check.
+- HX711 (datasheets/hx711.pdf): Supply AVDD/DVDD 2.6–5.5 V; PD_SCK>60 µs powers down; 10/80 SPS; settling 400 ms @10SPS.
+- RAK3172 (datasheets/rak3172_datasheet.md): Supply 2.0–3.6 V; sleep current ~1.69 µA @3.3 V.
+- CPT-9019S (datasheets/cpt-9019s-smt-tr.pdf): Drive up to 25 Vp-p; SPL spec at 3 Vp-p 4 kHz.
+- PTS645 (datasheets/pts645.pdf): Contact rating 50 mA @12 VDC; no IP rating stated.
+- GDEY0213B74/SSD1680: Example rails VGH~20 V, VGL ~ -20 V, VSH1 ~15 V, VSH2 ~5 V, VSL ~ -15 V, VCOM ~ -2 V (SSD1680 p41), logic supply VCI max +4.0 V abs (panel datasheet p9).
+- SI2301 (datasheets/SI2301(SOT-23).pdf): VDS -20 V, VGS ±8 V; RDS(on) typ 42 mΩ @ -4.5 V, 55 mΩ @ -2.5 V.
+No new component datasheets added in datasheets/ as of this review.

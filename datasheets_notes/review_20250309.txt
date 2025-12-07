@@ -1,0 +1,28 @@
+Quick datasheet pulls used for 2025-03-09 doc review (sources in datasheets/).
+
+HX711 (hx711.pdf)
+- Supply rails AVDD/DVDD 2.6–5.5 V; VSUP 2.7–5.5 V (p2 pin table, p3 Key Electrical Characteristics).
+- Output data rates: 10 SPS (RATE=0) or 80 SPS (RATE=1); settling time 400 ms at 10 SPS, 50 ms at 80 SPS (p3 Table 2 note 1).
+- Power-down via PD_SCK high >60 µs; wake resets to Channel A gain 128 (p5 Power down control).
+
+RAK3172 (rak3172_datasheet.md)
+- Supply range 2.0–3.6 V; datasheet does not provide a 3.9 V absolute max figure (Electrical Characteristics).
+- Sleep current typical 1.69 µA @ 3.3 V (Sleep Current table).
+- Pin 27 PB12 has an internal 10 kΩ pull-up (high-frequency variant) or pull-down (low-frequency) per pin table.
+
+GDEY0213B74 panel + SSD1680 driver
+- Panel absolute max logic supply VCI –0.5 to +4.0 V; logic I/O within VCI ±0.5 V (GDEY0213B74.pdf p9).
+- SSD1680 booster rails: VGH adjustable 10–20 V, VGL = –VGH; VSH1/VSH2 2.4–17 V; VSL –5 to –17 V; VCOM –3 to –0.2 V (SSD1680.pdf p5 Features, command table ranges). Table 11-2 example shows VGH ≈20 V, VGL ≈–20 V, VSH1 ≈15 V, VSH2 ≈5 V, VSL ≈–15 V, VCOM ≈–2 V (p41).
+- Reference circuit parts for the booster (GDEY0213B74.pdf p29): L1 47 µH (NR3015 class, 500 mA max), Q1 Si1308EDL MOSFET, D1–D3 MBR0530, C1–C12 1 µF/4.7 µF 25 V caps, R1/R2 0603/0805 1%.
+
+CPT-9019S-SMT-TR buzzer (cpt-9019s-smt-tr.pdf)
+- Drive rating up to 25 Vp-p; SPL 65 dB @ 10 cm with 3 Vp-p 4 kHz square wave; current ~5 mA at 3 Vp-p; rated frequency 4 kHz (p1).
+
+PTS645 tactile switch (pts645.pdf)
+- Contact rating max 50 mA @ 12 VDC, min 10 µA @ 1 VDC; dielectric strength 250 VAC min; insulation 1e11 Ω min; operating temp –40 to 85 °C; typical life 100k cycles per force option (p1–2).
+
+SI2301 P-channel MOSFET (SI2301(SOT-23).pdf)
+- VDS rating –20 V; VGS ±8 V; RDS(on) typ 42 mΩ @ VGS=–4.5 V ID=–2.8 A, typ 55 mΩ @ VGS=–2.5 V ID=–2 A; VGS(th) –0.45 to –1.0 V @ ID=–250 µA; body diode VF ≈ –1.2 V @ IS=–0.75 A (p1–2).
+
+RAK7268V2 gateway (rak7268v2_datasheet.md)
+- Power: PoE IEEE 802.3af 36–57 V; DC input per model either 12 V fixed or 9–24 V; Wi‑Fi 2.4 GHz AP included; 8 LoRa channels via SX1302 (Main Specifications table).

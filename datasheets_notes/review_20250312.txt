@@ -1,0 +1,14 @@
+2025-03-12 datasheet pull notes (sources in datasheets/).
+
+FX1901 compression load cell (ENG_DS_FX19_A13.pdf)
+- Ranges: 10, 25, 50, 100, 200 lbf.
+- Recommended excitation: 5 V (p2).
+- Full-scale output (except 200 lbf): 16–24 mV/V, nominal 20 mV/V (p2). 200 lbf range: 34.2–37.8 mV/V (p2).
+- Input resistance 2.4–3.6 kΩ; output resistance 1.76–2.64 kΩ (p2).
+- Operating temp 0–50 °C; storage –40 to +85 °C (p2).
+- Max overload 250% FS (150% for 200 lbf); insulation resistance 50 MΩ @ 500 VDC; deflection 0.05 mm at rated load (p2).
+
+HX711 ADC (hx711.pdf)
+- Full-scale differential input at AVDD=5 V: ±20 mV (Gain 128), ±40 mV (Gain 64), ±80 mV (Gain 32, Channel B) (p1 description). Because these values are specified at 5 V AVDD, full-scale scales with supply (e.g., at 3.3 V: ~±13.2 mV, ±26.4 mV, ±52.8 mV respectively).
+
+Other parts unchanged from prior notes (see review_20250311.txt): RAK3172 supply 2.0–3.6 V; CPT-9019S drive up to 25 Vp-p; PTS645 contact rating 50 mA @ 12 VDC; SSD1680 example rails VGH~20 V/VGL~–20 V, etc.; SI2301 VDS –20 V, VGS ±8 V.

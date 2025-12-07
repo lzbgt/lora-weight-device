@@ -1,0 +1,4 @@
+2025-03-17 datasheet references used:
+- HX711 (hx711.pdf): FS inputs at AVDD=5 V are ±20 mV (Gain 128), ±40 mV (Gain 64), ±80 mV (Gain 32); scales linearly with supply—at 3.3 V, Gain 32 range is ±52.8 mV.
+- FX1901 (ENG_DS_FX19_A13.pdf): nominal 20 mV/V (16–24 mV/V); at 3.3 V excitation FS ≈66 mV. Input resistance 2.4–3.6 kΩ; operating temp 0–50 °C.
+- No gateway component datasheets present for Plan B (ESP32-S3, RAK5146, W5500).

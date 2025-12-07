@@ -1,0 +1,6 @@
+HX711 key specs (from datasheets/hx711.pdf Features section):
+- Supply voltage: 2.6–5.5 V
+- Current consumption: normal operation < 1.5 mA, power down < 1 µA
+- PGA gains: 32 / 64 / 128 (Channel A selectable 128/64, Channel B fixed 32)
+- Output data rate selectable: 10 SPS or 80 SPS
+- On-chip regulator and oscillator; power-on reset; power-down via PD_SCK high

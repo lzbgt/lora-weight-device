@@ -1,0 +1,11 @@
+2025-03-13 datasheet facts referenced in this review (sources in datasheets/).
+
+HX711 (hx711.pdf)
+- At AVDD=5 V: FS differential input ±20 mV (Gain 128), ±40 mV (Gain 64), ±80 mV (Gain 32, Channel B) (p1 description). Full-scale scales linearly with supply, so at 3.3 V: ±13.2 mV (G128), ±26.4 mV (G64), ±52.8 mV (G32).
+
+FX1901 (ENG_DS_FX19_A13.pdf)
+- Recommended excitation 5 V; full-scale output span 16–24 mV/V, nominal 20 mV/V (p2). For 25 lbf/11 kg range, FS ≈66 mV at 3.3 V excitation.
+- Input resistance 2.4–3.6 kΩ; output resistance 1.76–2.64 kΩ (p2). Input current at 3.3 V is ~0.9–1.4 mA.
+- Operating temperature 0–50 °C; storage –40 to +85 °C; max overload 250% FS (p2).
+
+Other components unchanged from prior notes (see review_20250311.txt).

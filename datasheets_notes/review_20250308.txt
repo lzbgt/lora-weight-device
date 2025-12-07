@@ -1,0 +1,41 @@
+Component notes extracted for doc review (sources in datasheets/).
+
+HX711 (hx711.pdf)
+- Supply: AVDD/DVDD 2.6–5.5 V, VSUP 2.7–5.5 V per pin table (p2) and Key Electrical Characteristics (p3).
+- Normal analog supply current ~1.4 mA, digital supply ~100 µA; power-down currents 0.3 µA analog / 0.2 µA digital (p3, Table 2).
+- Output data rates 10 SPS (RATE=0) or 80 SPS (RATE=1); output settling time after power-up/channel/gain change is 400 ms at 10 SPS and 50 ms at 80 SPS (p3, Table 2 note 1).
+- PD_SCK >60 µs high enters power-down; waking resets and defaults to Channel A gain 128 (p5).
+
+GDEY0213B74 panel (GDEY0213B74.pdf)
+- Display is 250×122 active pixels, integrated gate/source drivers, oscillator, DC-DC/booster control, SRAM, LUT, temperature sensor (p6 Features/Overview).
+- Absolute max for logic supply VCI: -0.5 to +4.0 V; logic I/O within VCI ±0.5 V (p9, Abs Max Ratings).
+- Default source/gate drive settings: VSH1 ≈15 V (0x41 POR), VSH2 ≈5 V (0xA8 POR), VSL ≈-15 V (0x32 POR) per voltage setting table (p15).
+- Reference circuit requires external parts for the booster: L1 47 µH (NR3015 class, 500 mA max), Q1 Si1308EDL MOSFET, D1–D3 MBR0530 diodes, C1–C12 1 µF/4.7 µF 25 V caps, R1/R2 0603/0805 1% (p29 Reference Circuit parts list).
+
+SSD1680 driver IC (SSD1680.pdf)
+- Logic supply VCI 2.2–3.7 V; VDDIO tied to VCI; on-chip booster/regulator generates VGH/VGL/VSH1/VSH2/VSL/VCOM (p5 Features).
+- Voltage adjustment ranges: VGH 10–20 V (0.5 V steps), VGL = –VGH; VSH1/VSH2 2.4–17 V; VSL –5 to –17 V; VCOM –3 to –0.2 V (p5 Features, Table 7-1/command descriptions).
+- Regulator characteristic example (Table 11-2, p41) with VCI=3.0 V and rails enabled: VGH ≈20 V, VGL ≈–20 V, VSH1 ≈15 V, VSH2 ≈5 V, VSL ≈–15 V, VCOM ≈–2 V; operating-mode current about 1 mA under those conditions.
+- Booster/regulator needs external application circuit to generate the rails (p12, Section 6.3 Booster & Regulator).
+
+RAK3172 module (rak3172_datasheet.md)
+- Supply voltage range 2.0–3.6 V (Electrical Characteristics table).
+- Sleep current typical 1.69 µA @ 3.3 V (Sleep Current table); supports LoRaWAN 1.0.3 across EU868/US915/AS923/etc.
+- PB12 has internal 10 kΩ pull-up for high-frequency variant or pull-down for low-frequency (Pin 27 note).
+
+RAK7268V2 gateway (rak7268v2_datasheet.md)
+- Power: PoE IEEE 802.3af 36–57 V on all models; DC input depends on variant (12 V fixed or 9–24 V wide-range) (Main Specifications table).
+- Interfaces: 8-channel LoRa concentrator; 2.4 GHz Wi‑Fi AP; Ethernet with PoE; optional LTE only on RAK7268CV2 variants.
+
+CPT-9019S-SMT-TR buzzer (cpt-9019s-smt-tr.pdf)
+- Rated/operating drive up to 25 Vp-p; SPL 65 dB at 10 cm with 3 Vp-p 4 kHz square wave (p1).
+- Current approx 5 mA at 3 Vp-p, 4 kHz; rated frequency 4 kHz; operating temp –30 to 70 °C (p1).
+
+PTS645 tactile switch (pts645.pdf)
+- Contact rating max 50 mA @ 12 VDC, min 10 µA @ 1 VDC; dielectric strength 250 VAC min; insulation resistance 1e11 Ω min (p1 Electrical Characteristics).
+- Operating temperature –40 to 85 °C; standard operating life 100k cycles depending on force option (p1–2 Mechanical Characteristics).
+
+SI2301 P-channel MOSFET (SI2301(SOT-23).pdf)
+- VDS rating –20 V, VGS ±8 V; continuous drain current –2.8 A @ TA=25°C, pulsed –11.2 A (p1 Maximum Ratings).
+- RDS(on) typ 42 mΩ @ VGS=–4.5 V, ID=–2.8 A; typ 55 mΩ @ VGS=–2.5 V, ID=–2 A (p2 Electrical Characteristics).
+- VGS(th) –0.45 to –1.0 V at ID=–250 µA (p2); body diode VF about –1.2 V @ IS=–0.75 A (p2).

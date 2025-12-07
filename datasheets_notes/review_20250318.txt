@@ -1,0 +1,1 @@
+2025-03-18 review note: No new component datasheets added. Plan B gateway (ESP32-S3, RAK5146, W5500) still lacks supporting datasheets in `datasheets/`, so electrical specs for those parts are not validated here.

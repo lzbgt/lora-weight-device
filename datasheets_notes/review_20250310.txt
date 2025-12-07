@@ -1,0 +1,4 @@
+2025-03-10 doc cross-check summary (datasheets in datasheets/).
+- Reused specs from review_20250309.txt (HX711 supply 2.6–5.5 V, RAK3172 supply 2.0–3.6 V, SSD1680 rail examples VGH~20 V/VGL~–20 V/VSH1~15 V/VSH2~5 V/VSL~–15 V, CPT-9019S drive up to 25 Vp-p, PTS645 contact rating 50 mA @ 12 VDC, SI2301 VDS –20 V & RDS(on) 42 mΩ @ –4.5 V).
+- Current doc observations: HX711 range corrected to 2.6–5.5 V; RAK3172 abs max claim removed; CPT-9019S noted as 3–25 V drive matches datasheet; PTS645 IP67 claim removed.
+- Remaining unsupported: load cell bridge current still listed as “Est. ~1–2 mA depending on bridge resistance” in hardware_design.md, but no load cell datasheet is present in datasheets/ to confirm.

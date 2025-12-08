@@ -5,6 +5,9 @@ import math
 
 ROOT = Path(__file__).resolve().parents[1]
 SYM_BASE = Path('/Applications/kicad/kicad.app/Contents/SharedSupport/symbols')
+PAGE_W = 297.0  # A4 mm
+PAGE_H = 210.0
+SAFE = 12.0
 
 # Library resolution
 LIB_PATHS = {
@@ -143,6 +146,9 @@ FOOTPRINTS = {
     'U4': 'Package_TO_SOT_SMD:SOT-23-5',
     'JUSB': 'Connector_USB:USB_C_Receptacle_GT-USB-7010',
 }
+
+# Global bounds (filled during build after placement)
+BOUNDS = {}
 
 class Instance:
     def __init__(self, ref, sym_name, at):
@@ -372,40 +378,78 @@ def emit_stub_with_label(net, inst, pin):
     ]
 
 def emit_net_manhattan(net, conns):
-    """Connect all pins of a net to a shared anchor with orthogonal segments and one label."""
+    """Connect all pins of a net to a shared local anchor with orthogonal segments and one label."""
     if not conns:
         return []
-    xs = [c[2] for c in conns]
-    ys = [c[3] for c in conns]
-    max_x = max(xs)
-    min_x = min(xs)
-    median_y = sorted(ys)[len(ys)//2]
-    margin = 5.0
-    # choose side based on median of pin orientations: if most pins are on right (x close to max), anchor right; else left
-    anchor_right_score = sum(1 for x in xs if abs(x - max_x) < abs(x - min_x))
-    if anchor_right_score >= len(xs)/2:
-        ax = round(max_x + margin, 2)
+    # anchor near first pin, offset along its direction
+    ref0, pin0, x0, y0, dx0, dy0 = conns[0]
+    norm0 = math.hypot(dx0, dy0)
+    if norm0 == 0:
+        dirx0, diry0 = 1.0, 0.0
     else:
-        ax = round(min_x - margin, 2)
-    ay = round(median_y, 2)
+        dirx0, diry0 = dx0 / norm0, dy0 / norm0
+    anchor_dist = 15.0
+    ax = x0 + dirx0 * anchor_dist
+    ay = y0 + diry0 * anchor_dist
+    ax = min(max(ax, SAFE), PAGE_W - SAFE)
+    ay = min(max(ay, SAFE), PAGE_H - SAFE)
+
     lines = []
-    for _, _, x, y in conns:
-        # first horizontal, then vertical
-        if x != ax:
-            lines.append(f'  (wire (pts (xy {x:.2f} {y:.2f}) (xy {ax:.2f} {y:.2f})))')
-        if y != ay:
-            lines.append(f'  (wire (pts (xy {ax:.2f} {y:.2f}) (xy {ax:.2f} {ay:.2f})))')
-        if x == ax and y == ay:
-            # ensure the anchor is touched at least once
+    stub = 3.0
+    for _, _, x, y, dx, dy in conns:
+        norm = math.hypot(dx, dy)
+        if norm == 0:
+            dirx, diry = 1.0, 0.0
+        else:
+            dirx, diry = dx / norm, dy / norm
+        sx = x + dirx * stub
+        sy = y + diry * stub
+        # route from stub to anchor (horizontal then vertical)
+        if sx != ax:
+            lines.append(f'  (wire (pts (xy {sx:.2f} {sy:.2f}) (xy {ax:.2f} {sy:.2f})))')
+        if sy != ay:
+            lines.append(f'  (wire (pts (xy {ax:.2f} {sy:.2f}) (xy {ax:.2f} {ay:.2f})))')
+        if sx == ax and sy == ay:
             lines.append(f'  (wire (pts (xy {ax:.2f} {ay:.2f}) (xy {ax:.2f} {ay + 0.01:.2f})))')
-    if len(conns) > 2:
+    if len(conns) >= 2:
         lines.append(f'  (junction (at {ax:.2f} {ay:.2f}))')
     label_x, label_y = ax + 2.54, ay
     lines.append(f'  (wire (pts (xy {ax:.2f} {ay:.2f}) (xy {label_x:.2f} {label_y:.2f})))')
     lines.append(f'  (label "{net}" (at {label_x:.2f} {label_y:.2f} 0) (effects (font (size 1.27 1.27))))')
     return lines
 
+def compute_shift(target=(150, 100)):
+    xs = [inst.at[0] for inst in INSTANCES.values()]
+    ys = [inst.at[1] for inst in INSTANCES.values()]
+    if not xs or not ys:
+        return (0, 0)
+    mid_x = (min(xs) + max(xs)) / 2
+    mid_y = (min(ys) + max(ys)) / 2
+    return (target[0] - mid_x, target[1] - mid_y)
+
+def apply_shift(shift):
+    dx, dy = shift
+    for inst in INSTANCES.values():
+        x, y = inst.at
+        inst.at = (x + dx, y + dy)
+
+def compute_bounds(pad=10):
+    xs = [inst.at[0] for inst in INSTANCES.values()]
+    ys = [inst.at[1] for inst in INSTANCES.values()]
+    if not xs or not ys:
+        return {'min_x': 0, 'max_x': 0, 'min_y': 0, 'max_y': 0}
+    return {
+        'min_x': min(xs) - pad,
+        'max_x': max(xs) + pad,
+        'min_y': min(ys) - pad,
+        'max_y': max(ys) + pad,
+    }
+
 def build():
+    global BOUNDS
+    shift = compute_shift()
+    apply_shift(shift)
+    BOUNDS = compute_bounds()
     lines = sch_header()
     # cache blocks for symbols actually used on the sheet
     seen = set()
@@ -421,6 +465,11 @@ def build():
     lines.append('  )')
     for inst in INSTANCES.values():
         lines.extend(emit_symbol(inst))
+    # symbol instances for placed symbols
+    lines.append('  (symbol_instances')
+    for inst in INSTANCES.values():
+        lines.append(f'    (path "/" (reference "{inst.ref}") (unit 1))')
+    lines.append('  )')
     for net, conns in N.items():
         usable = []
         for ref, pin in conns:
@@ -429,9 +478,11 @@ def build():
             inst = INSTANCES[ref]
             try:
                 x, y = inst.pin_abs(pin)
+                p = inst.sym.pin(pin)
+                dx, dy = p.dir_vec()
             except KeyError:
                 continue
-            usable.append((ref, pin, x, y))
+            usable.append((ref, pin, x, y, dx, dy))
         if not usable:
             continue
         lines.extend(emit_net_manhattan(net, usable))

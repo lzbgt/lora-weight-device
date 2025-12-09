@@ -221,38 +221,38 @@ class Instance:
 
 
 INSTANCES = {
-    "U1": Instance("U1", "RAK3172", (170.18, 104.14)),
-    "U2": Instance("U2", "HX711", (88.9, 114.3)),
-    "J1": Instance("J1", "Conn_01x04", (63.5, 114.3)),
-    "JDBG1": Instance("JDBG1", "Conn_02x06_Odd_Even", (119.38, 59.69)),
+    "U1": Instance("U1", "RAK3172", (177.8, 110.49)),
+    "U2": Instance("U2", "HX711", (81.28, 119.38)),
+    "J1": Instance("J1", "Conn_01x04", (55.88, 119.38)),
+    "JDBG1": Instance("JDBG1", "Conn_02x06_Odd_Even", (120.65, 55.88)),
     "Q1": Instance("Q1", "Q_PMOS_GSD", (121.92, 144.78)),
     "Rgate": Instance("R3", "R", (121.92, 133.35)),
     "Rtop": Instance("R1", "R", (139.7, 95.25)),
     "Rbot": Instance("R2", "R", (139.7, 106.68)),
-    "Q2": Instance("Q2", "Q_NMOS_GSD", (173.99, 146.05)),
-    "B1": Instance("BZ1", "Buzzer", (193.04, 148.59)),
-    "Rled": Instance("R4", "R", (181.61, 133.35)),
-    "LED": Instance("D1", "LED", (193.04, 133.35)),
-    "SW1": Instance("SW1", "SW_Push", (181.61, 120.65)),
-    "J2": Instance("J2", "GDEY0213B74", (264.16, 106.68)),
-    "U3": Instance("U3", "TPS61220DCK", (104.14, 162.56)),
-    "L1": Instance("L1", "L", (86.36, 162.56)),
-    "Dboost": Instance("D2", "D_Schottky_Small", (116.84, 162.56)),
-    "U4": Instance("U4", "MIC5504-3.3YM5", (226.06, 73.66)),
-    "Dusb": Instance("D3", "D_Schottky_Small", (236.22, 73.66)),
-    "JUSB": Instance("J3", "USB_C_Receptacle_PowerOnly_6P", (264.16, 44.45)),
-    "Rcc1": Instance("R5", "R", (276.86, 36.83)),
-    "Rcc2": Instance("R6", "R", (283.21, 36.83)),
-    "BT1": Instance("BT1", "Conn_01x04", (63.5, 152.4)),
-    "CHX1": Instance("C1", "C", (99.06, 133.35)),
-    "CHX2": Instance("C2", "C", (104.14, 140.97)),
-    "CVCC": Instance("C3", "C", (170.18, 83.82)),
+    "Q2": Instance("Q2", "Q_NMOS_GSD", (205.74, 146.05)),
+    "B1": Instance("BZ1", "Buzzer", (205.74, 154.94)),
+    "Rled": Instance("R4", "R", (194.31, 139.7)),
+    "LED": Instance("D1", "LED", (205.74, 139.7)),
+    "SW1": Instance("SW1", "SW_Push", (194.31, 125.73)),
+    "J2": Instance("J2", "GDEY0213B74", (240.03, 110.49)),
+    "U3": Instance("U3", "TPS61220DCK", (78.74, 175.26)),
+    "L1": Instance("L1", "L", (63.5, 175.26)),
+    "Dboost": Instance("D2", "D_Schottky_Small", (93.98, 175.26)),
+    "U4": Instance("U4", "MIC5504-3.3YM5", (214.63, 74.93)),
+    "Dusb": Instance("D3", "D_Schottky_Small", (224.79, 74.93)),
+    "J3": Instance("J3", "USB_C_Receptacle_PowerOnly_6P", (240.03, 44.45)),
+    "Rcc1": Instance("R5", "R", (225.0, 27.94)),
+    "Rcc2": Instance("R6", "R", (232.0, 27.94)),
+    "BT1": Instance("BT1", "Conn_01x04", (50.8, 154.94)),
+    "CHX1": Instance("C1", "C", (86.36, 137.16)),
+    "CHX2": Instance("C2", "C", (93.98, 142.24)),
+    "CVCC": Instance("C3", "C", (177.8, 91.44)),
     "PF_VCC": Instance("PWR1", "PWR_FLAG", (25.4, 25.4)),
-    "PF_BAT": Instance("PWR2", "PWR_FLAG", (25.4, 50.8)),
-    "PF_VBUS": Instance("PWR3", "PWR_FLAG", (25.4, 76.2)),
-    "PF_GND": Instance("PWR4", "PWR_FLAG", (25.4, 101.6)),
-    "PF_HX": Instance("PWR5", "PWR_FLAG", (25.4, 127.0)),
-    "PF_U3L": Instance("PWR6", "PWR_FLAG", (25.4, 152.4)),
+    "PF_BAT": Instance("PWR2", "PWR_FLAG", (25.4, 38.1)),
+    "PF_VBUS": Instance("PWR3", "PWR_FLAG", (25.4, 50.8)),
+    "PF_GND": Instance("PWR4", "PWR_FLAG", (25.4, 63.5)),
+    "PF_HX": Instance("PWR5", "PWR_FLAG", (25.4, 76.2)),
+    "PF_U3L": Instance("PWR6", "PWR_FLAG", (25.4, 88.9)),
 }
 
 N = {}
@@ -376,13 +376,13 @@ add("U4_OUT", "Dusb", "2")
 add("VCC", "Dusb", "1")
 
 # USB-C connector
-add("VBUS", "JUSB", "A9")
-add("VBUS", "JUSB", "B9")
-add("GND", "JUSB", "A12")
-add("GND", "JUSB", "B12")
-add("GND", "JUSB", "S1")
-add("CC1", "JUSB", "A5")
-add("CC2", "JUSB", "B5")
+add("VBUS", "J3", "A9")
+add("VBUS", "J3", "B9")
+add("GND", "J3", "A12")
+add("GND", "J3", "B12")
+add("GND", "J3", "S1")
+add("CC1", "J3", "A5")
+add("CC2", "J3", "B5")
 
 # CC pulldowns
 add("CC1", "Rcc1", "1")

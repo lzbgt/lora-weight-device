@@ -1,26 +1,32 @@
-ERC report (2025-12-09T19:12:23+0800, Encoding UTF8)
+ERC report (2025-12-09T20:22:33+0800, Encoding UTF8)
 
 ***** Sheet /
 [lib_symbol_issues]: The current configuration does not include the symbol library 'Power'
     ; warning
-    @(71.12 mm, 139.70 mm): Symbol #PWR2 [PWR_FLAG]
+    @(25.40 mm, 25.40 mm): Symbol #PWR1 [PWR_FLAG]
 [lib_symbol_issues]: The current configuration does not include the symbol library 'Power'
     ; warning
-    @(104.14 mm, 127.00 mm): Symbol #PWR5 [PWR_FLAG]
+    @(25.40 mm, 50.80 mm): Symbol #PWR2 [PWR_FLAG]
 [lib_symbol_issues]: The current configuration does not include the symbol library 'Power'
     ; warning
-    @(152.40 mm, 81.28 mm): Symbol #PWR1 [PWR_FLAG]
+    @(25.40 mm, 76.20 mm): Symbol #PWR3 [PWR_FLAG]
+[lib_symbol_issues]: The current configuration does not include the symbol library 'Power'
+    ; warning
+    @(25.40 mm, 101.60 mm): Symbol #PWR4 [PWR_FLAG]
+[lib_symbol_issues]: The current configuration does not include the symbol library 'Power'
+    ; warning
+    @(25.40 mm, 127.00 mm): Symbol #PWR5 [PWR_FLAG]
+[lib_symbol_issues]: The current configuration does not include the symbol library 'Power'
+    ; warning
+    @(25.40 mm, 152.40 mm): Symbol #PWR6 [PWR_FLAG]
 [footprint_link_issues]: Footprint 'SC-70-6_1.6x1.5mm_P0.5mm' not found in library 'Package_TO_SOT_SMD'.
     ; warning
-    @(97.79 mm, 152.40 mm): Symbol U3 [TPS61220DCK]
-[lib_symbol_issues]: The current configuration does not include the symbol library 'Power'
+    @(104.14 mm, 162.56 mm): Symbol U3 [TPS61220DCK]
+[footprint_link_issues]: Footprint 'USB_C_Receptacle_GT-USB-7010' not found in library 'Connector_USB'.
     ; warning
-    @(90.17 mm, 161.29 mm): Symbol #PWR6 [PWR_FLAG]
-[lib_symbol_issues]: The current configuration does not include the symbol library 'Power'
+    @(264.16 mm, 44.45 mm): Symbol J3 [USB_C_Receptacle_PowerOnly_6P]
+[footprint_link_issues]: Footprint 'TE_1-1734839-4_1x24-1MP_P0.5mm_Horizontal' not found in library 'Connector_FFC-FPC'.
     ; warning
-    @(190.50 mm, 63.50 mm): Symbol #PWR3 [PWR_FLAG]
-[lib_symbol_issues]: The current configuration does not include the symbol library 'Power'
-    ; warning
-    @(152.40 mm, 163.83 mm): Symbol #PWR4 [PWR_FLAG]
+    @(264.16 mm, 106.68 mm): Symbol J2 [GDEY0213B74]
 
- ** ERC messages: 7  Errors 0  Warnings 7
+ ** ERC messages: 9  Errors 0  Warnings 9

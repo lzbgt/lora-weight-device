@@ -7,8 +7,9 @@ ROOT = Path(__file__).resolve().parents[1]
 SYM_BASE = Path("/Applications/kicad/kicad.app/Contents/SharedSupport/symbols")
 
 GRID = 1.27  # 50 mil for clean snapping
-STUB_LEN = GRID * 3  # longer stubs to push labels away from the body
+STUB_LEN = GRID * 6  # longer stubs to push labels away from the body
 ANCHOR_DIST = GRID * 3
+LABEL_NUDGE = GRID * 0.5  # small offset to keep text off the wire
 
 LIB_PATHS = {
     "Project_Lib": ROOT / "hardware/pcb/project_lib.kicad_sym",
@@ -145,24 +146,59 @@ FOOTPRINTS = {
     "BT1": "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical",
     "Q1": "Package_TO_SOT_SMD:SOT-23",
     "Q2": "Package_TO_SOT_SMD:SOT-23",
-    "Rgate": "Resistor_SMD:R_0603_1608Metric",
-    "Rtop": "Resistor_SMD:R_0603_1608Metric",
-    "Rbot": "Resistor_SMD:R_0603_1608Metric",
-    "Rled": "Resistor_SMD:R_0603_1608Metric",
-    "Rcc1": "Resistor_SMD:R_0603_1608Metric",
-    "Rcc2": "Resistor_SMD:R_0603_1608Metric",
-    "CHX1": "Capacitor_SMD:C_0603_1608Metric",
-    "CHX2": "Capacitor_SMD:C_0603_1608Metric",
-    "CVCC": "Capacitor_SMD:C_0603_1608Metric",
+    "R1": "Resistor_SMD:R_0603_1608Metric",
+    "R2": "Resistor_SMD:R_0603_1608Metric",
+    "R3": "Resistor_SMD:R_0603_1608Metric",
+    "R4": "Resistor_SMD:R_0603_1608Metric",
+    "R5": "Resistor_SMD:R_0603_1608Metric",
+    "R6": "Resistor_SMD:R_0603_1608Metric",
+    "C1": "Capacitor_SMD:C_0603_1608Metric",
+    "C2": "Capacitor_SMD:C_0603_1608Metric",
+    "C3": "Capacitor_SMD:C_0603_1608Metric",
     "L1": "Inductor_SMD:L_0603_1608Metric",
-    "Dboost": "Diode_SMD:D_SOD-123",
-    "Dusb": "Diode_SMD:D_SOD-123",
-    "B1": "Buzzer_Beeper:MagneticBuzzer_CUI_CMT-8504-100-SMT",
-    "LED": "LED_SMD:LED_0603_1608Metric",
+    "D2": "Diode_SMD:D_SOD-123",
+    "D3": "Diode_SMD:D_SOD-123",
+    "BZ1": "Buzzer_Beeper:MagneticBuzzer_CUI_CMT-8504-100-SMT",
+    "D1": "LED_SMD:LED_0603_1608Metric",
     "SW1": "Button_Switch_SMD:SW_SPST_TL3342",
     "U3": "Package_TO_SOT_SMD:SC-70-6_1.6x1.5mm_P0.5mm",
     "U4": "Package_TO_SOT_SMD:SOT-23-5",
-    "JUSB": "Connector_USB:USB_C_Receptacle_GT-USB-7010",
+    "J3": "Connector_USB:USB_C_Receptacle_GT-USB-7010",
+    "J2": "Connector_FFC-FPC:TE_1-1734839-4_1x24-1MP_P0.5mm_Horizontal",
+}
+
+VALUES = {
+    # Resistors
+    "R1": "1M",
+    "R2": "1M",
+    "R3": "100k",
+    "R4": "1k",
+    "R5": "5k1",
+    "R6": "5k1",
+    # Capacitors / inductors
+    "C1": "10uF",
+    "C2": "0.1uF",
+    "C3": "10uF",
+    "L1": "4.7uH",
+    # Diodes
+    "D1": "RED",
+    "D2": "SS14",
+    "D3": "SS14",
+    # ICs / active
+    "U1": "RAK3172",
+    "U2": "HX711",
+    "U3": "TPS61220",
+    "U4": "MIC5504-3.3",
+    "Q1": "SI2301",
+    "Q2": "2N7002",
+    # Connectors / misc
+    "J1": "LoadCell",
+    "J2": "EInk_FPC",
+    "J3": "USB-C_Power",
+    "JDBG": "DBG/SWD/I2C/UART",
+    "BT1": "Battery",
+    "BZ1": "Buzzer",
+    "SW1": "USER_BTN",
 }
 
 
@@ -184,38 +220,38 @@ class Instance:
 
 
 INSTANCES = {
-    "U1": Instance("U1", "RAK3172", (152.4, 114.3)),
-    "U2": Instance("U2", "HX711", (104.14, 114.3)),
-    "J1": Instance("J1", "Conn_01x04", (71.12, 114.3)),
-    "JDBG": Instance("JDBG", "Conn_02x06_Odd_Even", (215.9, 63.5)),
+    "U1": Instance("U1", "RAK3172", (170.18, 104.14)),
+    "U2": Instance("U2", "HX711", (88.9, 114.3)),
+    "J1": Instance("J1", "Conn_01x04", (63.5, 114.3)),
+    "JDBG": Instance("JDBG", "Conn_02x06_Odd_Even", (119.38, 59.69)),
     "Q1": Instance("Q1", "Q_PMOS_GSD", (121.92, 144.78)),
     "Rgate": Instance("R3", "R", (121.92, 133.35)),
     "Rtop": Instance("R1", "R", (139.7, 95.25)),
     "Rbot": Instance("R2", "R", (139.7, 106.68)),
     "Q2": Instance("Q2", "Q_NMOS_GSD", (173.99, 146.05)),
-    "B1": Instance("BZ1", "Buzzer", (185.42, 146.05)),
-    "Rled": Instance("R4", "R", (173.99, 130.81)),
-    "LED": Instance("D1", "LED", (185.42, 130.81)),
-    "SW1": Instance("SW1", "SW_Push", (173.99, 118.11)),
-    "J2": Instance("J2", "GDEY0213B74", (215.9, 114.3)),
-    "U3": Instance("U3", "TPS61220DCK", (97.79, 152.4)),
-    "L1": Instance("L1", "L", (83.82, 152.4)),
-    "Dboost": Instance("D2", "D_Schottky_Small", (109.22, 152.4)),
-    "U4": Instance("U4", "MIC5504-3.3YM5", (190.5, 86.36)),
-    "Dusb": Instance("D3", "D_Schottky_Small", (200.66, 86.36)),
-    "JUSB": Instance("J3", "USB_C_Receptacle_PowerOnly_6P", (241.3, 52.07)),
-    "Rcc1": Instance("R5", "R", (254.0, 44.45)),
-    "Rcc2": Instance("R6", "R", (260.35, 44.45)),
-    "BT1": Instance("BT1", "Conn_01x04", (71.12, 152.4)),
-    "CHX1": Instance("C1", "C", (104.14, 133.35)),
-    "CHX2": Instance("C2", "C", (109.22, 140.97)),
-    "CVCC": Instance("C3", "C", (152.4, 88.9)),
-    "PF_VCC": Instance("PWR1", "PWR_FLAG", (152.4, 81.28)),
-    "PF_BAT": Instance("PWR2", "PWR_FLAG", (71.12, 139.7)),
-    "PF_VBUS": Instance("PWR3", "PWR_FLAG", (190.5, 63.5)),
-    "PF_GND": Instance("PWR4", "PWR_FLAG", (152.4, 163.83)),
-    "PF_HX": Instance("PWR5", "PWR_FLAG", (104.14, 127.0)),
-    "PF_U3L": Instance("PWR6", "PWR_FLAG", (90.17, 161.29)),
+    "B1": Instance("BZ1", "Buzzer", (193.04, 148.59)),
+    "Rled": Instance("R4", "R", (181.61, 133.35)),
+    "LED": Instance("D1", "LED", (193.04, 133.35)),
+    "SW1": Instance("SW1", "SW_Push", (181.61, 120.65)),
+    "J2": Instance("J2", "GDEY0213B74", (264.16, 106.68)),
+    "U3": Instance("U3", "TPS61220DCK", (104.14, 162.56)),
+    "L1": Instance("L1", "L", (86.36, 162.56)),
+    "Dboost": Instance("D2", "D_Schottky_Small", (116.84, 162.56)),
+    "U4": Instance("U4", "MIC5504-3.3YM5", (226.06, 73.66)),
+    "Dusb": Instance("D3", "D_Schottky_Small", (236.22, 73.66)),
+    "JUSB": Instance("J3", "USB_C_Receptacle_PowerOnly_6P", (264.16, 44.45)),
+    "Rcc1": Instance("R5", "R", (276.86, 36.83)),
+    "Rcc2": Instance("R6", "R", (283.21, 36.83)),
+    "BT1": Instance("BT1", "Conn_01x04", (63.5, 152.4)),
+    "CHX1": Instance("C1", "C", (99.06, 133.35)),
+    "CHX2": Instance("C2", "C", (104.14, 140.97)),
+    "CVCC": Instance("C3", "C", (170.18, 83.82)),
+    "PF_VCC": Instance("PWR1", "PWR_FLAG", (25.4, 25.4)),
+    "PF_BAT": Instance("PWR2", "PWR_FLAG", (25.4, 50.8)),
+    "PF_VBUS": Instance("PWR3", "PWR_FLAG", (25.4, 76.2)),
+    "PF_GND": Instance("PWR4", "PWR_FLAG", (25.4, 101.6)),
+    "PF_HX": Instance("PWR5", "PWR_FLAG", (25.4, 127.0)),
+    "PF_U3L": Instance("PWR6", "PWR_FLAG", (25.4, 152.4)),
 }
 
 N = {}
@@ -424,6 +460,7 @@ def sch_header():
 def emit_symbol(inst: Instance):
     x, y = inst.at
     fp = FOOTPRINTS.get(inst.ref)
+    val = VALUES.get(inst.ref, inst.sym.lib_id.split(":")[-1])
     ref_y = y - 2 * GRID
     val_y = y + 2 * GRID
     lines = [
@@ -433,7 +470,7 @@ def emit_symbol(inst: Instance):
         f'    (property "Reference" "{inst.ref}" (id 0) (at {fmt(x)} {fmt(ref_y)} 0)',
         '      (effects (font (size 1.27 1.27)))',
         "    )",
-        f'    (property "Value" "{inst.sym.lib_id.split(":")[-1]}" (id 1) (at {fmt(x)} {fmt(val_y)} 0)',
+        f'    (property "Value" "{val}" (id 1) (at {fmt(x)} {fmt(val_y)} 0)',
         '      (effects (font (size 1.27 1.27)))',
         "    )",
     ]
@@ -455,13 +492,17 @@ def emit_net(net, conns):
         stub_x = snap(x + dx_use)
         stub_y = snap(y + dy_use)
         lines.append(f'  (wire (pts (xy {fmt(x)} {fmt(y)}) (xy {fmt(stub_x)} {fmt(stub_y)})))')
-        # Place the label on the stub endpoint with justification that pushes text away from the pin/body.
+        # Place the label on the stub endpoint, nudged further in the stub direction and justified away from the body.
         if abs(dx_use) >= abs(dy_use):
-            justify = "left" if dx_use >= 0 else "right"
+            justify = "right" if dx_use > 0 else "left"
+            lx = stub_x
+            ly = stub_y
         else:
-            justify = "top" if dy_use >= 0 else "bottom"
+            justify = "bottom" if dy_use > 0 else "top"
+            lx = stub_x
+            ly = stub_y
         lines.append(
-            f'  (label "{net}" (at {fmt(stub_x)} {fmt(stub_y)} 0) (effects (font (size 1.27 1.27)) (justify {justify})))'
+            f'  (label "{net}" (at {fmt(lx)} {fmt(ly)} 0) (effects (font (size 1.27 1.27)) (justify {justify})))'
         )
     return lines
 

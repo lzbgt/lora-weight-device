@@ -11,6 +11,7 @@
 "J2","EInk_FPC","Connector_FFC-FPC:TE_2-1734839-4_1x24-1MP_P0.5mm_Horizontal","1",""
 "J3","USB-C_Power","Connector_USB:USB_C_Receptacle_HRO_TYPE-C-31-M-12","1",""
 "JDBG1","DBG/SWD/I2C/UART","Connector_PinHeader_2.54mm:PinHeader_2x06_P2.54mm_Vertical","1",""
+"JDBG_I2C?","I2C+BOOT0+PWR","Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical","1",""
 "L1","4.7uH","Inductor_SMD:L_0603_1608Metric","1",""
 "Q1","SI2301","Package_TO_SOT_SMD:SOT-23","1",""
 "Q2","2N7002","Package_TO_SOT_SMD:SOT-23","1",""

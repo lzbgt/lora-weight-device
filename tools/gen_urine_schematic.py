@@ -123,6 +123,7 @@ SYM_CACHE = {
     "GDEY0213B74": parse_symbol("Project_Lib", "GDEY0213B74"),
     "HX711": parse_symbol("Analog_ADC", "HX711"),
     "Conn_01x04": parse_symbol("Connector_Generic", "Conn_01x04"),
+    "Conn_01x05": parse_symbol("Connector_Generic", "Conn_01x05"),
     "Conn_02x06_Odd_Even": parse_symbol("Connector_Generic", "Conn_02x06_Odd_Even"),
     "Q_PMOS_GSD": parse_symbol("Transistor_FET", "Q_PMOS_GSD"),
     "Q_NMOS_GSD": parse_symbol("Transistor_FET", "Q_NMOS_GSD"),
@@ -144,6 +145,7 @@ FOOTPRINTS = {
     "U2": "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm",
     "J1": "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical",
     "JDBG1": "Connector_PinHeader_2.54mm:PinHeader_2x06_P2.54mm_Vertical",
+    "JDBG_I2C": "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical",
     "BT1": "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical",
     "Q1": "Package_TO_SOT_SMD:SOT-23",
     "Q2": "Package_TO_SOT_SMD:SOT-23",
@@ -197,6 +199,7 @@ VALUES = {
     "J2": "EInk_FPC",
     "J3": "USB-C_Power",
     "JDBG1": "DBG/SWD/I2C/UART",
+    "JDBG_I2C": "I2C+BOOT0+PWR",
     "BT1": "Battery",
     "BZ1": "Buzzer",
     "SW1": "USER_BTN",
@@ -221,32 +224,33 @@ class Instance:
 
 
 INSTANCES = {
-    "U1": Instance("U1", "RAK3172", (177.8, 110.49)),
-    "U2": Instance("U2", "HX711", (81.28, 119.38)),
-    "J1": Instance("J1", "Conn_01x04", (55.88, 119.38)),
-    "JDBG1": Instance("JDBG1", "Conn_02x06_Odd_Even", (120.65, 55.88)),
+    "U1": Instance("U1", "RAK3172", (185.42, 110.49)),
+    "U2": Instance("U2", "HX711", (78.74, 123.19)),
+    "J1": Instance("J1", "Conn_01x04", (50.80, 123.19)),
+    "JDBG1": Instance("JDBG1", "Conn_02x06_Odd_Even", (111.76, 55.88)),
+    "JDBG_I2C": Instance("JDBG_I2C", "Conn_01x05", (162.56, 62.23)),
     "Q1": Instance("Q1", "Q_PMOS_GSD", (121.92, 144.78)),
     "Rgate": Instance("R3", "R", (121.92, 133.35)),
     "Rtop": Instance("R1", "R", (139.7, 95.25)),
     "Rbot": Instance("R2", "R", (139.7, 106.68)),
-    "Q2": Instance("Q2", "Q_NMOS_GSD", (205.74, 146.05)),
-    "B1": Instance("BZ1", "Buzzer", (205.74, 154.94)),
-    "Rled": Instance("R4", "R", (194.31, 139.7)),
-    "LED": Instance("D1", "LED", (205.74, 139.7)),
-    "SW1": Instance("SW1", "SW_Push", (194.31, 125.73)),
-    "J2": Instance("J2", "GDEY0213B74", (240.03, 110.49)),
-    "U3": Instance("U3", "TPS61220DCK", (78.74, 175.26)),
-    "L1": Instance("L1", "L", (63.5, 175.26)),
-    "Dboost": Instance("D2", "D_Schottky_Small", (93.98, 175.26)),
-    "U4": Instance("U4", "MIC5504-3.3YM5", (214.63, 74.93)),
-    "Dusb": Instance("D3", "D_Schottky_Small", (224.79, 74.93)),
+    "Q2": Instance("Q2", "Q_NMOS_GSD", (215.90, 149.86)),
+    "B1": Instance("BZ1", "Buzzer", (220.98, 163.83)),
+    "Rled": Instance("R4", "R", (205.74, 142.24)),
+    "LED": Instance("D1", "LED", (215.90, 142.24)),
+    "SW1": Instance("SW1", "SW_Push", (205.74, 124.46)),
+    "J2": Instance("J2", "GDEY0213B74", (245.11, 110.49)),
+    "U3": Instance("U3", "TPS61220DCK", (71.12, 182.88)),
+    "L1": Instance("L1", "L", (55.88, 182.88)),
+    "Dboost": Instance("D2", "D_Schottky_Small", (91.44, 182.88)),
+    "U4": Instance("U4", "MIC5504-3.3YM5", (220.98, 77.47)),
+    "Dusb": Instance("D3", "D_Schottky_Small", (231.14, 77.47)),
     "J3": Instance("J3", "USB_C_Receptacle_PowerOnly_6P", (240.03, 44.45)),
-    "Rcc1": Instance("R5", "R", (225.0, 27.94)),
-    "Rcc2": Instance("R6", "R", (232.0, 27.94)),
-    "BT1": Instance("BT1", "Conn_01x04", (50.8, 154.94)),
-    "CHX1": Instance("C1", "C", (86.36, 137.16)),
-    "CHX2": Instance("C2", "C", (93.98, 142.24)),
-    "CVCC": Instance("C3", "C", (177.8, 91.44)),
+    "Rcc1": Instance("R5", "R", (224.79, 30.48)),
+    "Rcc2": Instance("R6", "R", (232.41, 30.48)),
+    "BT1": Instance("BT1", "Conn_01x04", (48.26, 157.48)),
+    "CHX1": Instance("C1", "C", (81.28, 139.70)),
+    "CHX2": Instance("C2", "C", (91.44, 146.05)),
+    "CVCC": Instance("C3", "C", (185.42, 92.71)),
     "PF_VCC": Instance("PWR1", "PWR_FLAG", (25.4, 25.4)),
     "PF_BAT": Instance("PWR2", "PWR_FLAG", (25.4, 38.1)),
     "PF_VBUS": Instance("PWR3", "PWR_FLAG", (25.4, 50.8)),
@@ -411,6 +415,13 @@ add("I2C_SCL", "JDBG1", "9")
 add("I2C_SDA", "JDBG1", "10")
 add("GND", "JDBG1", "11")
 add("VCC", "JDBG1", "12")
+
+# Dedicated I2C/BOOT0 breakout (1x05)
+add("GND", "JDBG_I2C", "1")
+add("VCC", "JDBG_I2C", "2")
+add("I2C_SCL", "JDBG_I2C", "3")
+add("I2C_SDA", "JDBG_I2C", "4")
+add("BOOT0", "JDBG_I2C", "5")
 
 # Power flags
 add("VCC", "PF_VCC", "1")

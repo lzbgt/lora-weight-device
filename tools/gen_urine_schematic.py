@@ -7,7 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SYM_BASE = Path("/Applications/kicad/kicad.app/Contents/SharedSupport/symbols")
 
 GRID = 1.27  # 50 mil for clean snapping
-STUB_LEN = GRID * 2
+STUB_LEN = GRID * 3  # longer stubs to push labels away from the body
 ANCHOR_DIST = GRID * 3
 
 LIB_PATHS = {
@@ -455,12 +455,13 @@ def emit_net(net, conns):
         stub_x = snap(x + dx_use)
         stub_y = snap(y + dy_use)
         lines.append(f'  (wire (pts (xy {fmt(x)} {fmt(y)}) (xy {fmt(stub_x)} {fmt(stub_y)})))')
-        # Label slightly offset from the stub end to avoid overlap with the wire.
-        norm = math.hypot(dx_use, dy_use) or 1.0
-        lx = snap(stub_x + (dx_use / norm) * GRID * 0.4)
-        ly = snap(stub_y + (dy_use / norm) * GRID * 0.4)
+        # Place the label on the stub endpoint with justification that pushes text away from the pin/body.
+        if abs(dx_use) >= abs(dy_use):
+            justify = "left" if dx_use >= 0 else "right"
+        else:
+            justify = "top" if dy_use >= 0 else "bottom"
         lines.append(
-            f'  (label "{net}" (at {fmt(lx)} {fmt(ly)} 0) (effects (font (size 1.27 1.27))))'
+            f'  (label "{net}" (at {fmt(stub_x)} {fmt(stub_y)} 0) (effects (font (size 1.27 1.27)) (justify {justify})))'
         )
     return lines
 

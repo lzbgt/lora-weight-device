@@ -94,11 +94,12 @@ def extract_block_from(text, start_index):
     raise ValueError("unbalanced")
 
 
-def parse_symbol(lib, name):
+def parse_symbol(lib, name, alias_lib=None):
     lib_path = LIB_PATHS[lib]
     text = lib_path.read_text()
+    lib_id = alias_lib or lib
     block = extract_block(text, f'(symbol "{name}"')
-    block = block.replace(f'(symbol "{name}"', f'(symbol "{lib}:{name}"', 1)
+    block = block.replace(f'(symbol "{name}"', f'(symbol "{lib_id}:{name}"', 1)
     pins = []
     idx = 0
     while True:
@@ -114,7 +115,7 @@ def parse_symbol(lib, name):
         idx = pin_start + len(pin_block)
     if not pins:
         raise ValueError(f"no pins parsed for {lib}:{name}")
-    return Symbol(f"{lib}:{name}", pins, block)
+    return Symbol(f"{lib_id}:{name}", pins, block)
 
 
 SYM_CACHE = {
@@ -135,14 +136,14 @@ SYM_CACHE = {
     "TPS61220DCK": parse_symbol("Regulator_Switching", "TPS61220DCK"),
     "MIC5504-3.3YM5": parse_symbol("Regulator_Linear", "MIC5504-3.3YM5"),
     "USB_C_Receptacle_PowerOnly_6P": parse_symbol("Connector", "USB_C_Receptacle_PowerOnly_6P"),
-    "PWR_FLAG": parse_symbol("Power", "PWR_FLAG"),
+    "PWR_FLAG": parse_symbol("Project_Lib", "PWR_FLAG"),
 }
 
 FOOTPRINTS = {
     "U1": "RF_Module:RAK3172",
     "U2": "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm",
     "J1": "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical",
-    "JDBG": "Connector_PinHeader_2.54mm:PinHeader_2x06_P2.54mm_Vertical",
+    "JDBG1": "Connector_PinHeader_2.54mm:PinHeader_2x06_P2.54mm_Vertical",
     "BT1": "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical",
     "Q1": "Package_TO_SOT_SMD:SOT-23",
     "Q2": "Package_TO_SOT_SMD:SOT-23",
@@ -161,10 +162,10 @@ FOOTPRINTS = {
     "BZ1": "Buzzer_Beeper:MagneticBuzzer_CUI_CMT-8504-100-SMT",
     "D1": "LED_SMD:LED_0603_1608Metric",
     "SW1": "Button_Switch_SMD:SW_SPST_TL3342",
-    "U3": "Package_TO_SOT_SMD:SC-70-6_1.6x1.5mm_P0.5mm",
+    "U3": "Package_TO_SOT_SMD:SOT-363_SC-70-6",
     "U4": "Package_TO_SOT_SMD:SOT-23-5",
-    "J3": "Connector_USB:USB_C_Receptacle_GT-USB-7010",
-    "J2": "Connector_FFC-FPC:TE_1-1734839-4_1x24-1MP_P0.5mm_Horizontal",
+    "J3": "Connector_USB:USB_C_Receptacle_HRO_TYPE-C-31-M-12",
+    "J2": "Connector_FFC-FPC:TE_2-1734839-4_1x24-1MP_P0.5mm_Horizontal",
 }
 
 VALUES = {
@@ -195,7 +196,7 @@ VALUES = {
     "J1": "LoadCell",
     "J2": "EInk_FPC",
     "J3": "USB-C_Power",
-    "JDBG": "DBG/SWD/I2C/UART",
+    "JDBG1": "DBG/SWD/I2C/UART",
     "BT1": "Battery",
     "BZ1": "Buzzer",
     "SW1": "USER_BTN",
@@ -223,7 +224,7 @@ INSTANCES = {
     "U1": Instance("U1", "RAK3172", (170.18, 104.14)),
     "U2": Instance("U2", "HX711", (88.9, 114.3)),
     "J1": Instance("J1", "Conn_01x04", (63.5, 114.3)),
-    "JDBG": Instance("JDBG", "Conn_02x06_Odd_Even", (119.38, 59.69)),
+    "JDBG1": Instance("JDBG1", "Conn_02x06_Odd_Even", (119.38, 59.69)),
     "Q1": Instance("Q1", "Q_PMOS_GSD", (121.92, 144.78)),
     "Rgate": Instance("R3", "R", (121.92, 133.35)),
     "Rtop": Instance("R1", "R", (139.7, 95.25)),
@@ -398,18 +399,18 @@ add("VCC", "CVCC", "1")
 add("GND", "CVCC", "2")
 
 # Debug / expansion header (2x6)
-add("GND", "JDBG", "1")
-add("VCC", "JDBG", "2")
-add("UART2_RX", "JDBG", "3")
-add("UART2_TX", "JDBG", "4")
-add("SWDIO", "JDBG", "5")
-add("SWCLK", "JDBG", "6")
-add("NRST", "JDBG", "7")
-add("BOOT0", "JDBG", "8")
-add("I2C_SCL", "JDBG", "9")
-add("I2C_SDA", "JDBG", "10")
-add("GND", "JDBG", "11")
-add("VCC", "JDBG", "12")
+add("GND", "JDBG1", "1")
+add("VCC", "JDBG1", "2")
+add("UART2_RX", "JDBG1", "3")
+add("UART2_TX", "JDBG1", "4")
+add("SWDIO", "JDBG1", "5")
+add("SWCLK", "JDBG1", "6")
+add("NRST", "JDBG1", "7")
+add("BOOT0", "JDBG1", "8")
+add("I2C_SCL", "JDBG1", "9")
+add("I2C_SDA", "JDBG1", "10")
+add("GND", "JDBG1", "11")
+add("VCC", "JDBG1", "12")
 
 # Power flags
 add("VCC", "PF_VCC", "1")

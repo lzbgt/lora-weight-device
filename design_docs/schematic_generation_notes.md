@@ -7,9 +7,11 @@ This note captures the automated changes to `hardware/pcb/urine_monitor.kicad_sc
   - Snap all placements to a 1.27 mm grid and draw short per-pin stubs with labels (no shared anchors) to keep PDFs readable and clickable.
   - Corrected KiCad Y orientation and pin vectors so wires actually land on pins.
   - Added NO_CONNECT markers for unused pins (MCU spares, HX711 extras, E-ink NC/HV rails, battery holder spares, U4 pin4).
-  - Added power flags for `VCC`, `BAT`, `VBUS`, `HX_VCC`, `U3_L`, `GND` to satisfy ERC.
+  - Added power flags for `VCC`, `BAT`, `VBUS`, `HX_VCC`, `U3_L`, `GND` (local `PWR_FLAG` cloned into `Project_Lib` to avoid missing-library warnings).
   - Exposed a 2×06 debug/expansion header (GND, VCC, UART2, SWDIO/SWCLK, NRST, BOOT0, I2C_SCL/SDA) on a 2.54 mm footprint.
   - Relocated parts to avoid label/wire collisions: moved LDO/USB diode cluster away from the debug header and spread the HX711 decouplers so `HX_VCC` no longer shorts to GND.
+  - Footprints aligned to stock KiCad libs to silence footprint warnings (e.g., `SOT-363_SC-70-6` for U3, `TE_2-1734839-4_1x24-1MP_P0.5mm_Horizontal` for the E-ink FPC, standard USB-C and pin headers).
+  - Added explicit Value map so BOM shows specs and intent (e.g., `R3 100k`, `R5/R6 5k1 CC pulldowns, JDBG` debug label).
 - **Outputs regenerated**
   - Schematic: `hardware/pcb/urine_monitor.kicad_sch`
   - PDF: `hardware/pcb/urine_monitor.pdf`
@@ -25,8 +27,8 @@ python tools/gen_urine_schematic.py
 ```
 
 ## ERC status
-- **Errors:** none (power-flag conflicts resolved).
-- **Warnings:** library path warnings for `power` symbols (expected in headless runs) and a missing SC70-6 footprint library path for `TPS61220DCK`. Nets are otherwise clean.
+- **Errors:** none (clean).
+- **Warnings:** none (clean) after localizing `PWR_FLAG` and using stock footprints.
 
 ## Readability / navigation
 - Each pin has its own labeled stub (no overlapping anchors), making PDF search/click reliable.

@@ -7,7 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SYM_BASE = Path("/Applications/kicad/kicad.app/Contents/SharedSupport/symbols")
 
 GRID = 1.27  # 50 mil for clean snapping
-STUB_LEN = GRID * 6  # longer stubs to push labels away from the body
+STUB_LEN = GRID * 4  # medium stubs to push labels away from the body
 ANCHOR_DIST = GRID * 3
 LABEL_NUDGE = GRID * 0.5  # small offset to keep text off the wire
 
@@ -224,33 +224,33 @@ class Instance:
 
 
 INSTANCES = {
-    "U1": Instance("U1", "RAK3172", (185.42, 110.49)),
-    "U2": Instance("U2", "HX711", (78.74, 123.19)),
-    "J1": Instance("J1", "Conn_01x04", (50.80, 123.19)),
-    "JDBG1": Instance("JDBG1", "Conn_02x06_Odd_Even", (111.76, 55.88)),
-    "JDBG_I2C": Instance("JDBG_I2C", "Conn_01x05", (162.56, 62.23)),
+    "U1": Instance("U1", "RAK3172", (205.74, 113.03)),
+    "U2": Instance("U2", "HX711", (74.93, 130.81)),
+    "J1": Instance("J1", "Conn_01x04", (46.99, 130.81)),
+    "JDBG1": Instance("JDBG1", "Conn_02x06_Odd_Even", (142.24, 88.90)),
+    "JDBG_I2C": Instance("JDBG_I2C", "Conn_01x05", (170.18, 52.07)),
     "Q1": Instance("Q1", "Q_PMOS_GSD", (121.92, 144.78)),
     "Rgate": Instance("R3", "R", (121.92, 133.35)),
     "Rtop": Instance("R1", "R", (139.7, 95.25)),
     "Rbot": Instance("R2", "R", (139.7, 106.68)),
-    "Q2": Instance("Q2", "Q_NMOS_GSD", (215.90, 149.86)),
-    "B1": Instance("BZ1", "Buzzer", (220.98, 163.83)),
-    "Rled": Instance("R4", "R", (205.74, 142.24)),
-    "LED": Instance("D1", "LED", (215.90, 142.24)),
-    "SW1": Instance("SW1", "SW_Push", (205.74, 124.46)),
-    "J2": Instance("J2", "GDEY0213B74", (245.11, 110.49)),
-    "U3": Instance("U3", "TPS61220DCK", (71.12, 182.88)),
-    "L1": Instance("L1", "L", (55.88, 182.88)),
-    "Dboost": Instance("D2", "D_Schottky_Small", (91.44, 182.88)),
-    "U4": Instance("U4", "MIC5504-3.3YM5", (220.98, 77.47)),
-    "Dusb": Instance("D3", "D_Schottky_Small", (231.14, 77.47)),
+    "Q2": Instance("Q2", "Q_NMOS_GSD", (220.98, 153.67)),
+    "B1": Instance("BZ1", "Buzzer", (228.60, 170.18)),
+    "Rled": Instance("R4", "R", (210.82, 142.24)),
+    "LED": Instance("D1", "LED", (220.98, 142.24)),
+    "SW1": Instance("SW1", "SW_Push", (207.01, 125.73)),
+    "J2": Instance("J2", "GDEY0213B74", (250.19, 110.49)),
+    "U3": Instance("U3", "TPS61220DCK", (71.12, 190.50)),
+    "L1": Instance("L1", "L", (55.88, 190.50)),
+    "Dboost": Instance("D2", "D_Schottky_Small", (91.44, 190.50)),
+    "U4": Instance("U4", "MIC5504-3.3YM5", (220.98, 81.28)),
+    "Dusb": Instance("D3", "D_Schottky_Small", (231.14, 81.28)),
     "J3": Instance("J3", "USB_C_Receptacle_PowerOnly_6P", (240.03, 44.45)),
     "Rcc1": Instance("R5", "R", (224.79, 30.48)),
     "Rcc2": Instance("R6", "R", (232.41, 30.48)),
-    "BT1": Instance("BT1", "Conn_01x04", (48.26, 157.48)),
-    "CHX1": Instance("C1", "C", (81.28, 139.70)),
-    "CHX2": Instance("C2", "C", (91.44, 146.05)),
-    "CVCC": Instance("C3", "C", (185.42, 92.71)),
+    "BT1": Instance("BT1", "Conn_01x04", (48.26, 165.10)),
+    "CHX1": Instance("C1", "C", (81.28, 146.05)),
+    "CHX2": Instance("C2", "C", (91.44, 151.13)),
+    "CVCC": Instance("C3", "C", (193.04, 95.25)),
     "PF_VCC": Instance("PWR1", "PWR_FLAG", (25.4, 25.4)),
     "PF_BAT": Instance("PWR2", "PWR_FLAG", (25.4, 38.1)),
     "PF_VBUS": Instance("PWR3", "PWR_FLAG", (25.4, 50.8)),
@@ -504,7 +504,7 @@ def emit_net(net, conns):
         stub_x = snap(x + dx_use)
         stub_y = snap(y + dy_use)
         lines.append(f'  (wire (pts (xy {fmt(x)} {fmt(y)}) (xy {fmt(stub_x)} {fmt(stub_y)})))')
-        # Place the label on the stub endpoint, nudged further in the stub direction and justified away from the body.
+        # Place the label on the stub endpoint with justification pushed away from the symbol.
         if abs(dx_use) >= abs(dy_use):
             justify = "right" if dx_use > 0 else "left"
             lx = stub_x

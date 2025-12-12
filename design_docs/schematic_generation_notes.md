@@ -5,6 +5,7 @@ This note captures the automated changes to `hardware/pcb/urine_monitor.kicad_sc
 ## What changed
 - **Generator refresh (`tools/gen_urine_schematic.py`)**
   - Snap all placements to a 1.27 mm grid and draw short per-pin stubs with labels (no shared anchors) to keep PDFs readable and clickable.
+  - Emits a **multi-sheet schematic** for readability: root sheet only holds four sheet blocks (`MCU + Debug`, `Load Cell + HX711`, `Power Entry + Regulation`, `E-Ink Display`) so each logical block is on its own page with global labels tying nets together.
   - Corrected KiCad Y orientation and pin vectors so wires actually land on pins.
   - Added NO_CONNECT markers for unused pins (MCU spares, HX711 extras, E-ink NC/HV rails, battery holder spares, U4 pin4).
   - Added power flags for `VCC`, `BAT`, `VBUS`, `HX_VCC`, `U3_L`, `GND` (local `PWR_FLAG` cloned into `Project_Lib` to avoid missing-library warnings).
@@ -32,6 +33,7 @@ python tools/gen_urine_schematic.py
 
 ## Readability / navigation
 - Each pin has its own labeled stub (no overlapping anchors), making PDF search/click reliable.
+- The root sheet is a simple map to four logical sheets so you can skim by page (MCU/Debug, HX711 + load cell, Power, Display). Signals stay connected via global labels across sheets.
 - Labels are offset slightly from the wire ends to avoid overlap with pins or wires.
 - LDO/USB cluster and HX711 decouplers were spaced to prevent unintended shorts to GND.
 

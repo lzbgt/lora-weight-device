@@ -8,11 +8,9 @@ OUT_DIR = ROOT / "hardware" / "pcb"
 SYM_BASE = Path("/Applications/kicad/kicad.app/Contents/SharedSupport/symbols")
 
 GRID = 1.27  # 50 mil for clean snapping
-STUB_LEN = GRID * 6  # longer stubs for label clearance
+STUB_LEN = GRID * 4  # medium stubs to push labels away from the body
 ANCHOR_DIST = GRID * 3
-LABEL_NUDGE = GRID * 1.5  # keep text away from pin/body
-TOP_NETS = {"VCC", "VBUS", "BAT", "HX_VCC", "U3_OUT", "U4_OUT"}
-BOTTOM_NETS = {"GND"}
+LABEL_NUDGE = GRID * 0.5  # small offset to keep text off the wire
 
 LIB_PATHS = {
     "Project_Lib": ROOT / "hardware/pcb/project_lib.kicad_sym",
@@ -62,39 +60,12 @@ class Symbol:
         self.lib_id = lib_id
         self.pins = pins
         self.raw_block = raw_block
-        self._bbox = None
 
     def pin(self, num):
         for p in self.pins:
             if p.num == num:
                 return p
         raise KeyError(f"pin {num} not found in {self.lib_id}")
-
-    def local_bbox(self):
-        """Bounding box in symbol-local coords, padded to cover labels/body."""
-        if self._bbox:
-            return self._bbox
-        xs = [p.x for p in self.pins]
-        ys = [p.y for p in self.pins]
-        if not xs or not ys:
-            # Fallback to a small box if parsing ever fails.
-            pad = STUB_LEN + LABEL_NUDGE
-            self._bbox = (-pad, pad, -pad, pad)
-            return self._bbox
-        pad = STUB_LEN + LABEL_NUDGE  # leave room for pin text, stubs, labels
-        min_x, max_x = min(xs) - pad, max(xs) + pad
-        min_y, max_y = min(ys) - pad, max(ys) + pad
-        # Guarantee a minimum footprint so skinny parts still repel neighbors.
-        if max_x - min_x < GRID * 6:
-            cx = 0.5 * (min_x + max_x)
-            half = GRID * 3
-            min_x, max_x = cx - half, cx + half
-        if max_y - min_y < GRID * 6:
-            cy = 0.5 * (min_y + max_y)
-            half = GRID * 3
-            min_y, max_y = cy - half, cy + half
-        self._bbox = (min_x, max_x, min_y, max_y)
-        return self._bbox
 
 
 def extract_block(text, start_keyword):
@@ -123,46 +94,29 @@ def extract_block_from(text, start_index):
                 return text[start_index : i + 1]
     raise ValueError("unbalanced")
 
+
 def parse_symbol(lib, name, alias_lib=None):
-    print(f"Parsing {lib}:{name}...")
     lib_path = LIB_PATHS[lib]
     text = lib_path.read_text()
-    
-    # Using lib_id as "Lib:Name" for embedded symbols, as KiCad expects
-    lib_id = f"{lib}:{name}"
-    
+    lib_id = alias_lib or lib
     block = extract_block(text, f'(symbol "{name}"')
-    
-    # Rename symbol definition in the block
-    block = block.replace(f'(symbol "{name}"', f'(symbol "{lib_id}"', 1)
-    
+    block = block.replace(f'(symbol "{name}"', f'(symbol "{lib_id}:{name}"', 1)
     pins = []
     idx = 0
-    print(f"  Searching for pins in block for {lib}:{name}, len: {len(block)}")
     while True:
         pin_start = block.find("(pin", idx)
         if pin_start == -1:
-            print(f"  No more pins found for {lib}:{name}")
             break
-        print(f"  Found pin at index {pin_start} for {lib}:{name}")
         pin_block = extract_block_from(block, pin_start)
-        # Strip all whitespace and newlines for robust regex matching
-        pin_block_clean = re.sub(r'\s+', ' ', pin_block).strip()
-        
-        at_m = re.search(r"\(at ([^)]*)\)", pin_block_clean)
-        name_m = re.search(r'\(name "([^"]*)"', pin_block_clean)
-        num_m = re.search(r'\(number "([^"]*)"', pin_block_clean)
+        at_m = re.search(r"\(at ([^)]+)\)", pin_block)
+        name_m = re.search(r'\(name "([^"]*)"', pin_block)
+        num_m = re.search(r'\(number "([^"]*)"', pin_block)
         if at_m and name_m and num_m:
             pins.append(Pin(num_m.group(1), name_m.group(1), at_m.group(1)))
-            print(f"    Parsed pin: num={num_m.group(1)}, name={name_m.group(1)}")
-        else:
-            print(f"    Failed to parse pin block: {pin_block}")
         idx = pin_start + len(pin_block)
     if not pins:
-        print(f"  ERROR: No pins were parsed for {lib}:{name}")
         raise ValueError(f"no pins parsed for {lib}:{name}")
-    print(f"  Successfully parsed {len(pins)} pins for {lib}:{name}")
-    return Symbol(lib_id, pins, block)
+    return Symbol(f"{lib_id}:{name}", pins, block)
 
 
 SYM_CACHE = {
@@ -255,8 +209,7 @@ VALUES = {
 
 class Instance:
     def __init__(self, ref, sym_name, at):
-        self.ref = ref  # printed reference designator
-        self.key = None  # logical key in INSTANCES dict, set after construction
+        self.ref = ref
         self.sym = SYM_CACHE[sym_name]
         self.at = snap_pt(at)
         self.uuid = uuid.uuid4()
@@ -269,17 +222,6 @@ class Instance:
         p = self.sym.pin(pin_num)
         dx, dy = p.dir_vec(length)
         return dx, -dy  # invert Y for KiCad sheet coordinates
-
-    def bbox_abs(self, margin=0.0):
-        """Absolute bounding box (min_x, max_x, min_y, max_y) with optional margin."""
-        min_x, max_x, min_y, max_y = self.sym.local_bbox()
-        cx, cy = self.at
-        # KiCad Y grows downward, so invert Y axis for bounds.
-        abs_min_x = snap(cx + min_x - margin)
-        abs_max_x = snap(cx + max_x + margin)
-        abs_min_y = snap(cy - max_y - margin)
-        abs_max_y = snap(cy - min_y + margin)
-        return abs_min_x, abs_max_x, abs_min_y, abs_max_y
 
 
 INSTANCES = {
@@ -318,11 +260,8 @@ INSTANCES = {
     "PF_U3L": Instance("PWR6", "PWR_FLAG", (25.4, 88.9)),
 }
 
-# Tag each instance with its logical key for placement routines.
-for _key, _inst in INSTANCES.items():
-    _inst.key = _key
-
 N = {}
+
 
 def add(net, ref, pin):
     N.setdefault(net, []).append((ref, pin))
@@ -521,9 +460,6 @@ NO_CONNECTS = [
     ("U4", "4"),
 ]
 
-def clamp(val, lo, hi):
-    return max(lo, min(hi, val))
-
 
 class Sheet:
     def __init__(self, key, title, filename, refs, at, size=(80.0, 60.0), page=2):
@@ -597,13 +533,13 @@ SHEETS = [
 def sch_header(title=None, sheet_uuid=None):
     lines = [
         '(kicad_sch (version 20231105) (generator "gen_urine_schematic")',
-        f'  (uuid {sheet_uuid or uuid.uuid4()})',
+        f"  (uuid {sheet_uuid or uuid.uuid4()})",
         '  (paper "A4")',
-        '  (title_block',
+        "  (title_block",
     ]
     if title:
         lines.append(f'    (title "{title}")')
-    lines.append('  )')
+    lines.append("  )")
     return lines
 
 
@@ -629,21 +565,22 @@ def emit_symbol(inst: Instance):
     val_y = y + 2 * GRID
     lines = [
         f'  (symbol (lib_id "{inst.sym.lib_id}") (at {fmt(x)} {fmt(y)} 0) (unit 1)',
-        '    (in_bom yes) (on_board yes)',
-        f'    (uuid {inst.uuid})',
+        "    (in_bom yes) (on_board yes)",
+        f"    (uuid {inst.uuid})",
         f'    (property "Reference" "{inst.ref}" (id 0) (at {fmt(x)} {fmt(ref_y)} 0)',
         '      (effects (font (size 1.27 1.27)))',
-        '    )',
+        "    )",
         f'    (property "Value" "{val}" (id 1) (at {fmt(x)} {fmt(val_y)} 0)',
         '      (effects (font (size 1.27 1.27)))',
-        '    )',
+        "    )",
     ]
     if fp:
         lines.append(
             f'    (property "Footprint" "{fp}" (id 2) (at {fmt(x)} {fmt(val_y + 2 * GRID)} 0) (effects (font (size 1.27 1.27))))'
         )
-    lines.append('  )')
+    lines.append("  )")
     return lines
+
 
 def emit_net(net, conns):
     """Place a short stub off each pin with an adjacent global label so nets join across sheets."""
@@ -669,12 +606,15 @@ def emit_net(net, conns):
         )
     return lines
 
+
 def emit_no_connect(inst: Instance, pin):
     x, y = inst.pin_abs(pin)
     return f"  (no_connect (at {fmt(x)} {fmt(y)}) (uuid {uuid.uuid4()}))"
 
+
 def sheet_path(sheet: Sheet) -> str:
     return f"/{ROOT_SHEET_UUID}/{sheet.uuid}"
+
 
 def emit_sheet_block(sheet: Sheet):
     x, y = sheet.at
@@ -694,149 +634,20 @@ def emit_sheet_block(sheet: Sheet):
         f"    (uuid {sheet.uuid})",
         f'    (property "Sheetname" "{sheet.title}" (at {fmt(x)} {fmt(name_y)} 0)',
         '      (effects (font (size 1.27 1.27)) (justify left bottom))',
-        '    )',
+        "    )",
         f'    (property "Sheetfile" "{sheet.filename}" (at {fmt(x)} {fmt(file_y)} 0)',
         '      (effects (font (size 1.27 1.27)) (justify left top))',
-        '    )',
-        '    (instances',
+        "    )",
+        "    (instances",
         f'      (project "urine_monitor" (path "{sheet_path(sheet)}" (page "{sheet.page}")))',
-        '    )',
-        '  )',
+        "    )",
+        "  )",
     ]
     return lines
 
 
-def resolve_overlaps(instances, margin=GRID * 1.0, max_iter=25):
-    """Simple repel pass: nudge overlapping symbols apart while staying on grid."""
-    for _ in range(max_iter):
-        moved = False
-        bboxes = [inst.bbox_abs(margin) for inst in instances]
-        for i in range(len(instances)):
-            for j in range(i + 1, len(instances)):
-                ax1, ax2, ay1, ay2 = bboxes[i]
-                bx1, bx2, by1, by2 = bboxes[j]
-                overlap_x = min(ax2, bx2) - max(ax1, bx1)
-                overlap_y = min(ay2, by2) - max(ay1, by1)
-                if overlap_x <= 0 or overlap_y <= 0:
-                    continue
-                # Move along the cheaper axis to break overlap.
-                if overlap_x < overlap_y:
-                    shift = snap(overlap_x / 2 + GRID)
-                    xi, yi = instances[i].at
-                    xj, yj = instances[j].at
-                    instances[i].at = snap_pt((xi - shift, yi))
-                    instances[j].at = snap_pt((xj + shift, yj))
-                else:
-                    shift = snap(overlap_y / 2 + GRID)
-                    xi, yi = instances[i].at
-                    xj, yj = instances[j].at
-                    instances[i].at = snap_pt((xi, yi - shift))
-                    instances[j].at = snap_pt((xj, yj + shift))
-                moved = True
-        if not moved:
-            break
-
-
-def build_edges(sheet_refs):
-    """Return weighted pairwise edges between instances that share a net."""
-    edges = []
-    for net, conns in N.items():
-        refs = [ref for ref, pin in conns if ref in sheet_refs]
-        unique = sorted(set(refs))
-        if len(unique) < 2:
-            continue
-        w = 1.0 / (len(unique) - 1)
-        if net in ("SWDIO", "SWCLK", "I2C_SCL", "I2C_SDA"):
-            w *= 1.5
-        if net in ("UART2_RX", "UART2_TX", "EINK_SCK", "EINK_MOSI", "EINK_CS"):
-            w *= 1.2
-        for i in range(len(unique)):
-            for j in range(i + 1, len(unique)):
-                edges.append((unique[i], unique[j], w))
-    return edges
-
-
-def inst_net_map(sheet_refs):
-    net_map = {ref: set() for ref in sheet_refs}
-    for net, conns in N.items():
-        for ref, pin in conns:
-            if ref in net_map:
-                net_map[ref].add(net)
-    return net_map
-
-
-def relax_layout(instances, sheet_refs):
-    """Iteratively pull connected parts together, apply power/ground gravity, then de-overlap."""
-    ref_to_inst = {inst.key: inst for inst in instances}
-    edges = build_edges(sheet_refs)
-    neighbors = {ref: [] for ref in sheet_refs}
-    for a, b, w in edges:
-        neighbors[a].append((b, w))
-        neighbors[b].append((a, w))
-    net_map = inst_net_map(sheet_refs)
-
-    xs = [inst.at[0] for inst in instances]
-    ys = [inst.at[1] for inst in instances]
-    pad = GRID * 10
-    bounds = (
-        min(xs) - pad,
-        max(xs) + pad,
-        min(ys) - pad,
-        max(ys) + pad,
-    )
-
-    def clamp_to_bounds(pt):
-        x, y = pt
-        return clamp(x, bounds[0], bounds[1]), clamp(y, bounds[2], bounds[3])
-
-    for _ in range(12):
-        moved = False
-        for inst in instances:
-            neigh = neighbors.get(inst.key)
-            if not neigh:
-                continue
-            wx = wy = 0.0
-            wsum = 0.0
-            for nb_ref, w in neigh:
-                nb = ref_to_inst[nb_ref]
-                wx += nb.at[0] * w
-                wy += nb.at[1] * w
-                wsum += w
-            if wsum == 0:
-                continue
-            tx = wx / wsum
-            ty = wy / wsum
-            dx = tx - inst.at[0]
-            dy = ty - inst.at[1]
-            step_x = 0.0
-            step_y = 0.0
-            if abs(dx) > GRID * 0.5:
-                step_x = GRID if dx > 0 else -GRID
-            if abs(dy) > GRID * 0.5:
-                step_y = GRID if dy > 0 else -GRID
-
-            nets = net_map.get(inst.key, set())
-            if nets & TOP_NETS:
-                step_y -= GRID * 0.5
-            if nets & BOTTOM_NETS:
-                step_y += GRID * 0.5
-
-            if step_x or step_y:
-                nx = snap(inst.at[0] + step_x)
-                ny = snap(inst.at[1] + step_y)
-                nx, ny = clamp_to_bounds((nx, ny))
-                nx, ny = snap_pt((nx, ny))
-                if (nx, ny) != inst.at:
-                    inst.at = (nx, ny)
-                    moved = True
-        resolve_overlaps(instances, margin=GRID * 1.0, max_iter=6)
-        if not moved:
-            break
-
 def build_sheet(sheet: Sheet):
-    inst_map = {ref: INSTANCES[ref] for ref in sheet.refs}
-    instances = list(inst_map.values())
-    relax_layout(instances, sheet.refs)
+    instances = [INSTANCES[ref] for ref in sheet.refs]
     lines = sch_header(sheet.title, sheet.file_uuid)
     lines.extend(emit_lib_symbols(instances))
 
@@ -875,6 +686,7 @@ def build_sheet(sheet: Sheet):
     lines.append(")")
     return "\n".join(ln for ln in lines if ln is not None)
 
+
 def build_root():
     lines = sch_header("Urine Monitor", ROOT_SHEET_UUID)
     lines.append("  (lib_symbols)")
@@ -889,6 +701,7 @@ def build_root():
     lines.append("  (embedded_fonts no)")
     lines.append(")")
     return "\n".join(ln for ln in lines if ln is not None)
+
 
 def build_all():
     out_files = []

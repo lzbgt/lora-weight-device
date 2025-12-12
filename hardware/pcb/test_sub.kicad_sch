@@ -1,0 +1,11 @@
+(kicad_sch (version 20231105) (generator "test_minimal")
+  (uuid cce2a467-367b-47e4-8997-aaac1ece365d)
+  (paper "A4")
+  (title_block
+    (title "Sub Sheet")
+  )
+  (lib_symbols)
+  (sheet_instances
+    (path "/1be9a301-a101-41d0-a7fc-384e5352160b/cce2a467-367b-47e4-8997-aaac1ece365d" (page "2"))
+  )
+)

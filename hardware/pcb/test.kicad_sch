@@ -1,0 +1,26 @@
+(kicad_sch (version 20231105) (generator "test_minimal")
+  (uuid 1be9a301-a101-41d0-a7fc-384e5352160b)
+  (paper "A4")
+  (title_block
+    (title "Test Root")
+  )
+  (lib_symbols)
+  (sheet
+    (at 100 100)
+    (size 50 50)
+    (uuid cce2a467-367b-47e4-8997-aaac1ece365d)
+    (property "Sheetname" "Sub" (at 100 100 0)
+      (effects (font (size 1.27 1.27)) (justify left bottom))
+    )
+    (property "Sheetfile" "test_sub.kicad_sch" (at 100 150 0)
+      (effects (font (size 1.27 1.27)) (justify left top))
+    )
+    (instances
+      (project "test" (path "/1be9a301-a101-41d0-a7fc-384e5352160b/cce2a467-367b-47e4-8997-aaac1ece365d" (page "2")))
+    )
+  )
+  (sheet_instances
+    (path "/" (page "1"))
+    (path "/1be9a301-a101-41d0-a7fc-384e5352160b/cce2a467-367b-47e4-8997-aaac1ece365d" (page "2"))
+  )
+)

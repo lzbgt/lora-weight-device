@@ -11,8 +11,13 @@ GRID = 1.27  # 50 mil for clean snapping
 STUB_LEN = GRID * 6  # longer stubs for label clearance
 ANCHOR_DIST = GRID * 3
 LABEL_NUDGE = GRID * 1.5  # keep text away from pin/body
+PIN_TEXT_H = 1.27
+FOOTPRINT_OFFSET = max(4 * PIN_TEXT_H, 3 * PIN_TEXT_H)  # 4x pin label height
 TOP_NETS = {"VCC", "VBUS", "BAT", "HX_VCC", "U3_OUT", "U4_OUT"}
 BOTTOM_NETS = {"GND"}
+# KiCad default A4 frame is landscape: 297 mm x 210 mm.
+A4_W = 297.0
+A4_H = 210.0
 
 LIB_PATHS = {
     "Project_Lib": ROOT / "hardware/pcb/project_lib.kicad_sym",
@@ -93,6 +98,12 @@ class Symbol:
             cy = 0.5 * (min_y + max_y)
             half = GRID * 3
             min_y, max_y = cy - half, cy + half
+        # Enlarge downward to cover the footprint label box and its keepout.
+        extra_down = FOOTPRINT_OFFSET + 4 * PIN_TEXT_H  # 3x gap + 1x text height
+        min_y -= extra_down
+        # Slight horizontal padding so the label text width fits.
+        min_x -= GRID * 4
+        max_x += GRID * 4
         self._bbox = (min_x, max_x, min_y, max_y)
         return self._bbox
 
@@ -542,56 +553,19 @@ ROOT_SHEET_UUID = uuid.uuid4()
 
 SHEETS = [
     Sheet(
-        key="mcu_debug",
-        title="MCU + Debug",
-        filename="urine_monitor_mcu.kicad_sch",
-        refs=["U1", "JDBG1", "JDBG_I2C", "Rled", "LED", "SW1", "B1", "Q2"],
-        at=(35.56, 38.1),
-        page=2,
-    ),
-    Sheet(
-        key="load_cell",
-        title="Load Cell + HX711",
-        filename="urine_monitor_hx711.kicad_sch",
-        refs=["U2", "J1", "Q1", "Rgate", "CHX1", "CHX2", "PF_HX"],
-        at=(125.73, 38.1),
-        page=3,
-    ),
-    Sheet(
-        key="power",
-        title="Power Entry + Regulation",
-        filename="urine_monitor_power.kicad_sch",
-        refs=[
-            "U3",
-            "L1",
-            "Dboost",
-            "BT1",
-            "U4",
-            "Dusb",
-            "J3",
-            "Rcc1",
-            "Rcc2",
-            "PF_VCC",
-            "PF_BAT",
-            "PF_VBUS",
-            "PF_GND",
-            "PF_U3L",
-            "Rtop",
-            "Rbot",
-            "CVCC",
-        ],
-        at=(35.56, 114.3),
-        page=4,
-    ),
-    Sheet(
-        key="display",
-        title="E-Ink Display",
-        filename="urine_monitor_display.kicad_sch",
-        refs=["J2"],
-        at=(125.73, 114.3),
-        page=5,
+        key="all",
+        title="Urine Monitor",
+        filename="urine_monitor.kicad_sch",
+        refs=list(INSTANCES.keys()),
+        at=(0.0, 0.0),
+        page=1,
+        size=(A4_W, A4_H),
     ),
 ]
+
+# Flattening support: when there is only one sheet and it is already the root filename,
+# keep every path at "/" so KiCad CLI treats the file as a single-page design.
+FLAT_MODE = len(SHEETS) == 1 and SHEETS[0].filename == "urine_monitor.kicad_sch"
 
 
 def sch_header(title=None, sheet_uuid=None):
@@ -625,8 +599,13 @@ def emit_symbol(inst: Instance):
     x, y = inst.at
     fp = FOOTPRINTS.get(inst.ref)
     val = VALUES.get(inst.ref, inst.sym.lib_id.split(":")[-1])
-    ref_y = y - 2 * GRID
-    val_y = y + 2 * GRID
+
+    min_x, max_x, min_y, max_y = inst.sym.local_bbox()
+    abs_top = y - max_y
+    abs_bottom = y - min_y
+
+    ref_y = snap(abs_top - 3 * PIN_TEXT_H)
+    val_y = snap(abs_top - 1.5 * PIN_TEXT_H)
     lines = [
         f'  (symbol (lib_id "{inst.sym.lib_id}") (at {fmt(x)} {fmt(y)} 0) (unit 1)',
         '    (in_bom yes) (on_board yes)',
@@ -639,8 +618,10 @@ def emit_symbol(inst: Instance):
         '    )',
     ]
     if fp:
+        fp_y = snap(abs_bottom + FOOTPRINT_OFFSET)
         lines.append(
-            f'    (property "Footprint" "{fp}" (id 2) (at {fmt(x)} {fmt(val_y + 2 * GRID)} 0) (effects (font (size 1.27 1.27))))'
+            f'    (property "Footprint" "{fp}" (id 2) (at {fmt(x)} {fmt(fp_y)} 0) '
+            f'(effects (font (size 1.27 1.27))))'
         )
     lines.append('  )')
     return lines
@@ -674,6 +655,8 @@ def emit_no_connect(inst: Instance, pin):
     return f"  (no_connect (at {fmt(x)} {fmt(y)}) (uuid {uuid.uuid4()}))"
 
 def sheet_path(sheet: Sheet) -> str:
+    if FLAT_MODE:
+        return "/"
     return f"/{ROOT_SHEET_UUID}/{sheet.uuid}"
 
 def emit_sheet_block(sheet: Sheet):
@@ -833,6 +816,42 @@ def relax_layout(instances, sheet_refs):
         if not moved:
             break
 
+    # Center the cluster on the A4 page to avoid drifting to corners.
+    bboxes = [inst.bbox_abs(0) for inst in instances]
+    min_x = min(b[0] for b in bboxes)
+    max_x = max(b[1] for b in bboxes)
+    min_y = min(b[2] for b in bboxes)
+    max_y = max(b[3] for b in bboxes)
+    cx = (min_x + max_x) / 2
+    cy = (min_y + max_y) / 2
+    target_cx = A4_W / 2
+    target_cy = A4_H / 2
+    dx = snap(target_cx - cx)
+    dy = snap(target_cy - cy)
+    for inst in instances:
+        inst.at = snap_pt((inst.at[0] + dx, inst.at[1] + dy))
+
+    # Fit the cluster within page margins.
+    margin = GRID * 8  # ~10 mm
+    bboxes = [inst.bbox_abs(0) for inst in instances]
+    min_x = min(b[0] for b in bboxes)
+    max_x = max(b[1] for b in bboxes)
+    min_y = min(b[2] for b in bboxes)
+    max_y = max(b[3] for b in bboxes)
+    shift_x = 0.0
+    shift_y = 0.0
+    if min_x < margin:
+        shift_x = margin - min_x
+    if max_x > A4_W - margin:
+        shift_x = -(max_x - (A4_W - margin)) if shift_x == 0 else shift_x
+    if min_y < margin:
+        shift_y = margin - min_y
+    if max_y > A4_H - margin:
+        shift_y = -(max_y - (A4_H - margin)) if shift_y == 0 else shift_y
+    if shift_x or shift_y:
+        for inst in instances:
+            inst.at = snap_pt((inst.at[0] + shift_x, inst.at[1] + shift_y))
+
 def build_sheet(sheet: Sheet):
     inst_map = {ref: INSTANCES[ref] for ref in sheet.refs}
     instances = list(inst_map.values())
@@ -869,7 +888,7 @@ def build_sheet(sheet: Sheet):
             lines.append(emit_no_connect(INSTANCES[ref], pin))
 
     lines.append("  (sheet_instances")
-    lines.append(f'    (path "{sheet_path(sheet)}" (page "{sheet.page}"))')
+    lines.append(f'    (path "{sheet_path(sheet)}" (page "{sheet.page if not FLAT_MODE else 1}"))')
     lines.append("  )")
     lines.append("  (embedded_fonts no)")
     lines.append(")")
@@ -892,6 +911,13 @@ def build_root():
 
 def build_all():
     out_files = []
+    if len(SHEETS) == 1 and SHEETS[0].filename == "urine_monitor.kicad_sch":
+        contents = build_sheet(SHEETS[0])
+        path = OUT_DIR / "urine_monitor.kicad_sch"
+        path.write_text(contents)
+        out_files.append(path)
+        return out_files
+
     for sheet in SHEETS:
         contents = build_sheet(sheet)
         path = OUT_DIR / sheet.filename

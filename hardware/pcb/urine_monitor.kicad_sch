@@ -1,5 +1,5 @@
 (kicad_sch (version 20231105) (generator "gen_urine_schematic")
-  (uuid 8e147263-06eb-44cd-9824-b5249df4a883)
+  (uuid 839e2451-f023-487b-83ca-a3957f7538dd)
   (paper "A4")
   (title_block
     (title "Urine Monitor")
@@ -14,7 +14,7 @@
     (dnp no)
     (stroke (width 0) (type solid))
     (fill (color 0 0 0 0.0000))
-    (uuid 8f3b3e33-68b9-496a-990f-3473ccb9d6e0)
+    (uuid 876bed1e-685f-4596-8d83-509b9a88a367)
     (property "Sheetname" "MCU + Debug" (at 35.56 36.83 0)
       (effects (font (size 1.27 1.27)) (justify left bottom))
     )
@@ -22,7 +22,7 @@
       (effects (font (size 1.27 1.27)) (justify left top))
     )
     (instances
-      (project "urine_monitor" (path "/8e147263-06eb-44cd-9824-b5249df4a883/8f3b3e33-68b9-496a-990f-3473ccb9d6e0" (page "2")))
+      (project "urine_monitor" (path "/839e2451-f023-487b-83ca-a3957f7538dd/876bed1e-685f-4596-8d83-509b9a88a367" (page "2")))
     )
   )
   (sheet
@@ -34,7 +34,7 @@
     (dnp no)
     (stroke (width 0) (type solid))
     (fill (color 0 0 0 0.0000))
-    (uuid 984711a1-41ab-4b34-bf2a-d0d72bf74b02)
+    (uuid 35b2eed1-09e1-492a-858a-2378729d7c9e)
     (property "Sheetname" "Load Cell + HX711" (at 125.73 36.83 0)
       (effects (font (size 1.27 1.27)) (justify left bottom))
     )
@@ -42,7 +42,7 @@
       (effects (font (size 1.27 1.27)) (justify left top))
     )
     (instances
-      (project "urine_monitor" (path "/8e147263-06eb-44cd-9824-b5249df4a883/984711a1-41ab-4b34-bf2a-d0d72bf74b02" (page "3")))
+      (project "urine_monitor" (path "/839e2451-f023-487b-83ca-a3957f7538dd/35b2eed1-09e1-492a-858a-2378729d7c9e" (page "3")))
     )
   )
   (sheet
@@ -54,7 +54,7 @@
     (dnp no)
     (stroke (width 0) (type solid))
     (fill (color 0 0 0 0.0000))
-    (uuid 8903c837-e91c-443a-8de1-0a6f3ec5769f)
+    (uuid 173e64b9-db9b-4435-ba2b-375dcb3497cd)
     (property "Sheetname" "Power Entry + Regulation" (at 35.56 113.03 0)
       (effects (font (size 1.27 1.27)) (justify left bottom))
     )
@@ -62,7 +62,7 @@
       (effects (font (size 1.27 1.27)) (justify left top))
     )
     (instances
-      (project "urine_monitor" (path "/8e147263-06eb-44cd-9824-b5249df4a883/8903c837-e91c-443a-8de1-0a6f3ec5769f" (page "4")))
+      (project "urine_monitor" (path "/839e2451-f023-487b-83ca-a3957f7538dd/173e64b9-db9b-4435-ba2b-375dcb3497cd" (page "4")))
     )
   )
   (sheet
@@ -74,7 +74,7 @@
     (dnp no)
     (stroke (width 0) (type solid))
     (fill (color 0 0 0 0.0000))
-    (uuid 84f22eaa-0d30-421a-9d2b-c73f70fd763a)
+    (uuid 5df45be0-fc22-464e-8282-79889db5c0fd)
     (property "Sheetname" "E-Ink Display" (at 125.73 113.03 0)
       (effects (font (size 1.27 1.27)) (justify left bottom))
     )
@@ -82,15 +82,15 @@
       (effects (font (size 1.27 1.27)) (justify left top))
     )
     (instances
-      (project "urine_monitor" (path "/8e147263-06eb-44cd-9824-b5249df4a883/84f22eaa-0d30-421a-9d2b-c73f70fd763a" (page "5")))
+      (project "urine_monitor" (path "/839e2451-f023-487b-83ca-a3957f7538dd/5df45be0-fc22-464e-8282-79889db5c0fd" (page "5")))
     )
   )
   (sheet_instances
     (path "/" (page "1"))
-    (path "/8e147263-06eb-44cd-9824-b5249df4a883/8f3b3e33-68b9-496a-990f-3473ccb9d6e0" (page "2"))
-    (path "/8e147263-06eb-44cd-9824-b5249df4a883/984711a1-41ab-4b34-bf2a-d0d72bf74b02" (page "3"))
-    (path "/8e147263-06eb-44cd-9824-b5249df4a883/8903c837-e91c-443a-8de1-0a6f3ec5769f" (page "4"))
-    (path "/8e147263-06eb-44cd-9824-b5249df4a883/84f22eaa-0d30-421a-9d2b-c73f70fd763a" (page "5"))
+    (path "/839e2451-f023-487b-83ca-a3957f7538dd/876bed1e-685f-4596-8d83-509b9a88a367" (page "2"))
+    (path "/839e2451-f023-487b-83ca-a3957f7538dd/35b2eed1-09e1-492a-858a-2378729d7c9e" (page "3"))
+    (path "/839e2451-f023-487b-83ca-a3957f7538dd/173e64b9-db9b-4435-ba2b-375dcb3497cd" (page "4"))
+    (path "/839e2451-f023-487b-83ca-a3957f7538dd/5df45be0-fc22-464e-8282-79889db5c0fd" (page "5"))
   )
   (embedded_fonts no)
 )

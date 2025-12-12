@@ -10,8 +10,8 @@
 | **Buzzer** | CUI / Generic | **CPT-9019S** | Piezo Transducer, SMD or TH, 3V-25V Drive | 1 | $0.30 | DigiKey |
 | **Buzzer Driver** | OnSemi / Generic | **2N7002** | N-Channel MOSFET (SOT-23) | 1 | $0.05 | DigiKey |
 | **Power Gate** | Vishay / Generic | **SI2301** | P-Channel MOSFET (SOT-23) | 1 | $0.10 | DigiKey |
-| **Power Management** | Texas Instruments | **TPS61021A** | 3A Boost Converter (0.9V to 3.3V High Eff.) | 1 | $0.85 | DigiKey |
-| **Wall Power LDO** | Torex | **XC6220B331MR** | 3.3V LDO (5V In), SOT-23-5 | 1 | $0.35 | DigiKey |
+| **Power Management** | Texas Instruments | **TPS61220DCKR** | Boost Converter (SOT-23-6) used in current schematic | 1 | $0.40 | DigiKey |
+| **Wall Power LDO** | Microchip | **MIC5504-3.3YM5-TR** | 3.3V LDO (SOT-23-5) used in current schematic | 1 | $0.35 | DigiKey |
 | **Power Connector** | Generic | **USB Type-C** | 16-pin Power Only Receptacle, SMD | 1 | $0.40 | LCSC / DigiKey |
 | **Power Diode** | OnSemi | **SS14** | Schottky Diode (Low Vf) for OR-ing | 2 | $0.10 | DigiKey |
 | **Battery Holder** | Keystone | **1028** | Holder for 2x AA Cells, PCB Mount | 1 | $1.20 | DigiKey |

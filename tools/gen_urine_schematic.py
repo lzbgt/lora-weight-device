@@ -181,8 +181,10 @@ SYM_CACHE = {
     "GDEY0213B74": parse_symbol("Project_Lib", "GDEY0213B74"),
     "HX711": parse_symbol("Analog_ADC", "HX711"),
     "Conn_01x04": parse_symbol("Connector_Generic", "Conn_01x04"),
+    "Conn_01x02": parse_symbol("Connector_Generic", "Conn_01x02"),
     "Conn_01x05": parse_symbol("Connector_Generic", "Conn_01x05"),
     "Conn_02x06_Odd_Even": parse_symbol("Connector_Generic", "Conn_02x06_Odd_Even"),
+    "Conn_Coaxial": parse_symbol("Connector", "Conn_Coaxial"),
     "Q_PMOS_GSD": parse_symbol("Transistor_FET", "Q_PMOS_GSD"),
     "Q_NMOS_GSD": parse_symbol("Transistor_FET", "Q_NMOS_GSD"),
     "R": parse_symbol("Device", "R"),
@@ -195,6 +197,7 @@ SYM_CACHE = {
     "TPS61220DCK": parse_symbol("Regulator_Switching", "TPS61220DCK"),
     "MIC5504-3.3YM5": parse_symbol("Regulator_Linear", "MIC5504-3.3YM5"),
     "USB_C_Receptacle_PowerOnly_6P": parse_symbol("Connector", "USB_C_Receptacle_PowerOnly_6P"),
+    "USB_C_Receptacle_PowerOnly_24P": parse_symbol("Connector", "USB_C_Receptacle_PowerOnly_24P"),
     "PWR_FLAG": parse_symbol("Project_Lib", "PWR_FLAG"),
 }
 
@@ -205,7 +208,8 @@ FOOTPRINTS = {
     "JDBG1": "Connector_PinHeader_2.54mm:PinHeader_2x06_P2.54mm_Vertical",
     "JDBG_I2C": "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical",
     "J4": "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical",
-    "BT1": "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical",
+    "BT1": "Connector_JST:JST_PH_S2B-PH-SM4-TB_1x02-1MP_P2.00mm_Horizontal",
+    "J5": "Connector_Coaxial:U.FL_Hirose_U.FL-R-SMT-1_Vertical",
     "Q1": "Package_TO_SOT_SMD:SOT-23",
     "Q2": "Package_TO_SOT_SMD:SOT-23",
     "R1": "Resistor_SMD:R_0603_1608Metric",
@@ -260,7 +264,8 @@ VALUES = {
     "JDBG1": "DBG/SWD/I2C/UART",
     "JDBG_I2C": "I2C+BOOT0+PWR",
     "J4": "I2C+BOOT0+PWR",
-    "BT1": "Battery",
+    "BT1": "BAT_JST",
+    "J5": "Antenna_UFL",
     "BZ1": "Buzzer",
     "SW1": "USER_BTN",
 }
@@ -316,10 +321,11 @@ INSTANCES = {
     "Dboost": Instance("D2", "D_Schottky_Small", (91.44, 190.50)),
     "U4": Instance("U4", "MIC5504-3.3YM5", (220.98, 81.28)),
     "Dusb": Instance("D3", "D_Schottky_Small", (231.14, 81.28)),
-    "J3": Instance("J3", "USB_C_Receptacle_PowerOnly_6P", (240.03, 44.45)),
+    "J3": Instance("J3", "USB_C_Receptacle_PowerOnly_24P", (240.03, 44.45)),
     "Rcc1": Instance("R5", "R", (224.79, 30.48)),
     "Rcc2": Instance("R6", "R", (232.41, 30.48)),
-    "BT1": Instance("BT1", "Conn_01x04", (48.26, 165.10)),
+    "BT1": Instance("BT1", "Conn_01x02", (48.26, 165.10)),
+    "J5": Instance("J5", "Conn_Coaxial", (226.06, 97.79)),
     "CHX1": Instance("C1", "C", (81.28, 146.05)),
     "CHX2": Instance("C2", "C", (91.44, 151.13)),
     "CVCC": Instance("C3", "C", (193.04, 95.25)),
@@ -353,6 +359,7 @@ add("I2C_SCL", "U1", "9")
 add("I2C_SDA", "U1", "10")
 for gpin in ["11", "17", "18", "23", "28"]:
     add("GND", "U1", gpin)
+add("RF", "U1", "12")
 add("EINK_MOSI", "U1", "13")
 add("EINK_SCK", "U1", "15")
 add("EINK_CS", "U1", "16")
@@ -390,6 +397,10 @@ add("HX_INB-", "J1", "4")
 # Battery connector
 add("BAT", "BT1", "1")
 add("GND", "BT1", "2")
+
+# Antenna (u.FL)
+add("RF", "J5", "1")
+add("GND", "J5", "2")
 
 # HX power gate
 add("HX_VCC", "Q1", "3")
@@ -455,9 +466,13 @@ add("U4_OUT", "Dusb", "2")
 add("VCC", "Dusb", "1")
 
 # USB-C connector
+add("GND", "J3", "A1")
 add("VBUS", "J3", "A9")
+add("VBUS", "J3", "A4")
 add("VBUS", "J3", "B9")
+add("VBUS", "J3", "B4")
 add("GND", "J3", "A12")
+add("GND", "J3", "B1")
 add("GND", "J3", "B12")
 add("GND", "J3", "S1")
 add("CC1", "J3", "A5")
@@ -508,7 +523,6 @@ add("U3_L", "PF_U3L", "1")
 
 NO_CONNECTS = [
     ("U1", "5"),
-    ("U1", "12"),
     ("U1", "14"),
     ("U1", "20"),
     ("U1", "25"),
@@ -529,8 +543,6 @@ NO_CONNECTS = [
     ("J2", "22"),
     ("J2", "23"),
     ("J2", "24"),
-    ("BT1", "3"),
-    ("BT1", "4"),
     ("U4", "4"),
 ]
 

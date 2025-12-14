@@ -272,8 +272,8 @@ def auto_place(board, footprints, nets):
         "J5": (BOARD_W_MM - 5.5, 8.5),
         # E-ink FPC pulled off edge
         "J2": (BOARD_W_MM - 13, BOARD_H_MM * 0.52),
-        # Load cell header inset and raised further
-        "J1": (20, BOARD_H_MM * 0.52),
+        # Load cell header pulled to left edge near debug header for strain gauge wiring.
+        "J1": (6, BOARD_H_MM * 0.55),
         # USB-C: centered on the bottom short edge for dev power/debug.
         "J3": (BOARD_W_MM * 0.50, BOARD_H_MM - 9),
         # USB-UART bridge placed close to the USB connector.
@@ -287,8 +287,8 @@ def auto_place(board, footprints, nets):
         "R5": (BOARD_W_MM * 0.58, BOARD_H_MM - 16),
         "R6": (BOARD_W_MM * 0.64, BOARD_H_MM - 16),
         # Decoupling caps kept close to their IC domains.
-        "C1": (BOARD_W_MM * 0.20, BOARD_H_MM * 0.50),
-        "C2": (BOARD_W_MM * 0.24, BOARD_H_MM * 0.54),
+        "C1": (BOARD_W_MM * 0.18, BOARD_H_MM * 0.60),
+        "C2": (BOARD_W_MM * 0.16, BOARD_H_MM * 0.44),
         "C3": (BOARD_W_MM * 0.50, BOARD_H_MM - 26),
         # Battery JST kept on the bottom edge but offset to avoid the USB connector.
         "BT1": (BOARD_W_MM * 0.30, BOARD_H_MM - 16),
@@ -299,13 +299,13 @@ def auto_place(board, footprints, nets):
         # HX711 (load cell ADC) kept mid-left but off the RF can.
         "U2": (BOARD_W_MM * 0.26, BOARD_H_MM * 0.40),
         # Sense divider grouped close to HX711/load-cell domain.
-        "R1": (BOARD_W_MM * 0.18, BOARD_H_MM * 0.54),
-        "R2": (BOARD_W_MM * 0.25, BOARD_H_MM * 0.52),
+        "R1": (BOARD_W_MM * 0.22, BOARD_H_MM * 0.50),
+        "R2": (BOARD_W_MM * 0.28, BOARD_H_MM * 0.54),
         # Buzzer pushed to the upper-right away from RF, USB, and debug connectors.
         "BZ1": (BOARD_W_MM * 0.85, BOARD_H_MM * 0.20),
         # Aux header on edge; user button inset with more clearance.
-        "J4": (BOARD_W_MM - 6, BOARD_H_MM * 0.70),
-        "SW1": (BOARD_W_MM * 0.18, BOARD_H_MM * 0.24),
+        "J4": (10, BOARD_H_MM * 0.68),
+        "SW1": (BOARD_W_MM * 0.15, BOARD_H_MM - 8),
         # USB-side PMOS kept near the USB power path but off the edge.
         "Q1": (BOARD_W_MM * 0.58, BOARD_H_MM - 20),
         # NMOS for e-ink power gating kept mid-right with clearance.

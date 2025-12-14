@@ -55,13 +55,16 @@ To achieve a minimal device footprint, we utilize a **Compression Load Button** 
 *   **Orientation:** Vertical polarization is preferred for best omnidirectional coverage in a single-story ward.
 
 ## 7. User Interface & Battery
-*   **Display:** E-Ink or LCD mounted behind a clear PC (Polycarbonate) window glued into the Front Shell. The window must have a black masked border to hide the glue line.
+*   **Display:** E‑Ink (GDEY0213B74) mounted behind a clear PC (Polycarbonate) window glued into the Front Shell. The window should have a black masked border to hide the glue line.
 *   **Buttons:** **Membrane Keypad** (Stick-on) on the front surface.
     *   *Routing:* The FPC tail from the keypad must pass through a sealed slot (potted with resin) to reach the PCB.
     *   *Functions:* "Tare/Zero" (Short Press), "Range Toggle" (Long Press).
-*   **Battery Compartment:**
-    *   Separate compartment accessible from the back/side.
-    *   **Sealing:** Uses a silicone gasket and 2x captive screws to ensure compression. NOT a simple slide-latch (which fails IP65).
+*   **Battery (Current Plan):**
+    *   The battery pack is in a **separate battery case** and connects to the PCB via a **2‑wire JST‑PH cable**.
+    *   *Why:* reduces PCB size, reduces mechanical constraints on the PCB, and allows battery service without opening the electronics compartment.
+*   **USB‑C (Development):**
+    *   USB‑C should be accessible for bench power + console + flashing (via UART bootloader).
+    *   For IP‑rating, consider a gasketed rubber plug or a recessed port with a sealing cap.
 
 ## 7. 3D Printing for Prototype
 *   **Process:** FDM or SLA.

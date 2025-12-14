@@ -24,12 +24,14 @@ LIB_PATHS = {
     "Analog_ADC": SYM_BASE / "Analog_ADC.kicad_sym",
     "Connector_Generic": SYM_BASE / "Connector_Generic.kicad_sym",
     "Connector": SYM_BASE / "Connector.kicad_sym",
+    "Interface_USB": SYM_BASE / "Interface_USB.kicad_sym",
     "Device": SYM_BASE / "Device.kicad_sym",
     "Transistor_FET": SYM_BASE / "Transistor_FET.kicad_sym",
     "Regulator_Switching": SYM_BASE / "Regulator_Switching.kicad_sym",
     "Regulator_Linear": SYM_BASE / "Regulator_Linear.kicad_sym",
     "Switch": SYM_BASE / "Switch.kicad_sym",
     "Power": SYM_BASE / "power.kicad_sym",
+    "MCU_ST_STM32F0": SYM_BASE / "MCU_ST_STM32F0.kicad_sym",
 }
 
 
@@ -183,7 +185,6 @@ SYM_CACHE = {
     "Conn_01x04": parse_symbol("Connector_Generic", "Conn_01x04"),
     "Conn_01x02": parse_symbol("Connector_Generic", "Conn_01x02"),
     "Conn_01x05": parse_symbol("Connector_Generic", "Conn_01x05"),
-    "Conn_02x06_Odd_Even": parse_symbol("Connector_Generic", "Conn_02x06_Odd_Even"),
     "Conn_Coaxial": parse_symbol("Connector", "Conn_Coaxial"),
     "Q_PMOS_GSD": parse_symbol("Transistor_FET", "Q_PMOS_GSD"),
     "Q_NMOS_GSD": parse_symbol("Transistor_FET", "Q_NMOS_GSD"),
@@ -198,14 +199,16 @@ SYM_CACHE = {
     "MIC5504-3.3YM5": parse_symbol("Regulator_Linear", "MIC5504-3.3YM5"),
     "USB_C_Receptacle_PowerOnly_6P": parse_symbol("Connector", "USB_C_Receptacle_PowerOnly_6P"),
     "USB_C_Receptacle_PowerOnly_24P": parse_symbol("Connector", "USB_C_Receptacle_PowerOnly_24P"),
+    "USB_C_Receptacle_USB2.0_16P": parse_symbol("Connector", "USB_C_Receptacle_USB2.0_16P"),
+    "STM32F042F6Px": parse_symbol("MCU_ST_STM32F0", "STM32F042F6Px"),
     "PWR_FLAG": parse_symbol("Project_Lib", "PWR_FLAG"),
 }
 
 FOOTPRINTS = {
     "U1": "RF_Module:RAK3172",
     "U2": "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm",
+    "U5": "Package_SO:TSSOP-20_4.4x6.5mm_P0.65mm",
     "J1": "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical",
-    "JDBG1": "Connector_PinHeader_2.54mm:PinHeader_2x06_P2.54mm_Vertical",
     "JDBG_I2C": "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical",
     "J4": "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical",
     "BT1": "Connector_JST:JST_PH_S2B-PH-SM4-TB_1x02-1MP_P2.00mm_Horizontal",
@@ -221,6 +224,7 @@ FOOTPRINTS = {
     "C1": "Capacitor_SMD:C_0603_1608Metric",
     "C2": "Capacitor_SMD:C_0603_1608Metric",
     "C3": "Capacitor_SMD:C_0603_1608Metric",
+    "C4": "Capacitor_SMD:C_0603_1608Metric",
     "L1": "Inductor_SMD:L_0603_1608Metric",
     "D2": "Diode_SMD:D_SOD-123",
     "D3": "Diode_SMD:D_SOD-123",
@@ -245,6 +249,7 @@ VALUES = {
     "C1": "10uF",
     "C2": "0.1uF",
     "C3": "10uF",
+    "C4": "0.1uF",
     "L1": "4.7uH",
     # Diodes
     "D1": "RED",
@@ -255,13 +260,13 @@ VALUES = {
     "U2": "HX711",
     "U3": "TPS61220",
     "U4": "MIC5504-3.3",
+    "U5": "STM32F042F6P6 (USB CDC + CMSIS-DAP)",
     "Q1": "SI2301",
     "Q2": "2N7002",
     # Connectors / misc
     "J1": "LoadCell",
     "J2": "EInk_FPC",
-    "J3": "USB-C_Power",
-    "JDBG1": "DBG/SWD/I2C/UART",
+    "J3": "USB-C_Dev",
     "JDBG_I2C": "I2C+BOOT0+PWR",
     "J4": "I2C+BOOT0+PWR",
     "BT1": "BAT_JST",
@@ -304,7 +309,6 @@ INSTANCES = {
     "U1": Instance("U1", "RAK3172", (205.74, 113.03)),
     "U2": Instance("U2", "HX711", (74.93, 130.81)),
     "J1": Instance("J1", "Conn_01x04", (46.99, 130.81)),
-    "JDBG1": Instance("JDBG1", "Conn_02x06_Odd_Even", (142.24, 88.90)),
     "JDBG_I2C": Instance("J4", "Conn_01x05", (170.18, 52.07)),
     "Q1": Instance("Q1", "Q_PMOS_GSD", (121.92, 144.78)),
     "Rgate": Instance("R3", "R", (121.92, 133.35)),
@@ -321,7 +325,9 @@ INSTANCES = {
     "Dboost": Instance("D2", "D_Schottky_Small", (91.44, 190.50)),
     "U4": Instance("U4", "MIC5504-3.3YM5", (220.98, 81.28)),
     "Dusb": Instance("D3", "D_Schottky_Small", (231.14, 81.28)),
-    "J3": Instance("J3", "USB_C_Receptacle_PowerOnly_24P", (240.03, 44.45)),
+    "J3": Instance("J3", "USB_C_Receptacle_USB2.0_16P", (240.03, 44.45)),
+    "U5": Instance("U5", "STM32F042F6Px", (201.93, 44.45)),
+    "C4": Instance("C4", "C", (190.50, 55.88)),
     "Rcc1": Instance("R5", "R", (224.79, 30.48)),
     "Rcc2": Instance("R6", "R", (232.41, 30.48)),
     "BT1": Instance("BT1", "Conn_01x02", (48.26, 165.10)),
@@ -477,12 +483,33 @@ add("GND", "J3", "B12")
 add("GND", "J3", "S1")
 add("CC1", "J3", "A5")
 add("CC2", "J3", "B5")
+add("USB_DP", "J3", "A6")
+add("USB_DP", "J3", "B6")
+add("USB_DM", "J3", "A7")
+add("USB_DM", "J3", "B7")
 
 # CC pulldowns
 add("CC1", "Rcc1", "1")
 add("GND", "Rcc1", "2")
 add("CC2", "Rcc2", "1")
 add("GND", "Rcc2", "2")
+
+# USB debug bridge (STM32F042): USB CDC (UART) + CMSIS-DAP SWD.
+add("VCC", "U5", "16")  # VDD
+add("VCC", "U5", "5")  # VDDA
+add("GND", "U5", "15")  # VSSA
+add("VCC", "U5", "4")  # NRST pulled high (simple strap)
+add("USB_DM", "U5", "17")  # PA11
+add("USB_DP", "U5", "18")  # PA12
+add("SWDIO", "U5", "19")  # PA13 -> target SWDIO
+add("SWCLK", "U5", "20")  # PA14 -> target SWCLK
+add("NRST", "U5", "14")  # PB1 drives target NRST
+add("UART2_RX", "U5", "8")  # PA2 TX -> target RX
+add("UART2_TX", "U5", "9")  # PA3 RX <- target TX
+
+# USB bridge decoupling
+add("VCC", "C4", "1")
+add("GND", "C4", "2")
 
 # Decoupling
 add("HX_VCC", "CHX1", "1")
@@ -491,20 +518,6 @@ add("HX_VCC", "CHX2", "1")
 add("GND", "CHX2", "2")
 add("VCC", "CVCC", "1")
 add("GND", "CVCC", "2")
-
-# Debug / expansion header (2x6)
-add("GND", "JDBG1", "1")
-add("VCC", "JDBG1", "2")
-add("UART2_RX", "JDBG1", "3")
-add("UART2_TX", "JDBG1", "4")
-add("SWDIO", "JDBG1", "5")
-add("SWCLK", "JDBG1", "6")
-add("NRST", "JDBG1", "7")
-add("BOOT0", "JDBG1", "8")
-add("I2C_SCL", "JDBG1", "9")
-add("I2C_SDA", "JDBG1", "10")
-add("GND", "JDBG1", "11")
-add("VCC", "JDBG1", "12")
 
 # Dedicated I2C/BOOT0 breakout (1x05)
 add("GND", "JDBG_I2C", "1")
@@ -544,6 +557,19 @@ NO_CONNECTS = [
     ("J2", "23"),
     ("J2", "24"),
     ("U4", "4"),
+    # USB-C SBU pins unused
+    ("J3", "A8"),
+    ("J3", "B8"),
+    # STM32F042 unused pins
+    ("U5", "1"),
+    ("U5", "2"),
+    ("U5", "3"),
+    ("U5", "6"),
+    ("U5", "7"),
+    ("U5", "10"),
+    ("U5", "11"),
+    ("U5", "12"),
+    ("U5", "13"),
 ]
 
 def clamp(val, lo, hi):

@@ -31,8 +31,9 @@ ROOT = Path(__file__).resolve().parents[1]
 KI_FOOTPRINTS = Path("/Applications/kicad/kicad.app/Contents/SharedSupport/footprints")
 PROJECT_FP = ROOT / "hardware" / "pcb"
 KICAD_CLI = Path("/Applications/kicad/kicad.app/Contents/MacOS/kicad-cli")
-DEFAULT_BOARD_W_MM = 80.0
-DEFAULT_BOARD_H_MM = 60.0
+# Default to a tall board so the USB-C connector can sit centered on a short edge.
+DEFAULT_BOARD_W_MM = 60.0
+DEFAULT_BOARD_H_MM = 80.0
 
 
 def run(cmd):
@@ -242,7 +243,9 @@ def auto_place(board, footprints, nets):
     BOARD_H_MM = DEFAULT_BOARD_H_MM
     BOARD_MARGIN_MM = 5.0
     SLOT_STEP_MM = 10.0
-    OVERLAP_CLEAR_MM = 0.6
+    # Keep this close to the verification threshold to ensure the repel pass
+    # actually resolves overlaps that would fail placement checks.
+    OVERLAP_CLEAR_MM = 0.30
 
     def mm(x):
         return pcbnew.FromMM(x)
@@ -265,13 +268,54 @@ def auto_place(board, footprints, nets):
     # Fixed edge-biased placements for connectors/power/RF.
     specials = {
         "U1": (BOARD_W_MM * 0.55, 18),  # RF module near top edge
-        "J5": (BOARD_W_MM - 10, 8),  # u.FL at top-right
-        "JDBG1": (10, 8),  # debug header near top-left
-        "J2": (BOARD_W_MM - 9, BOARD_H_MM * 0.65),  # E-ink FPC on right edge
-        "J1": (8, BOARD_H_MM * 0.60),  # load cell header left edge
-        "J3": (BOARD_W_MM - 10, BOARD_H_MM - 9),  # USB-C near bottom-right
-        "BT1": (BOARD_W_MM * 0.45, BOARD_H_MM - 10),  # battery JST near bottom (balance)
-        "BZ1": (BOARD_W_MM * 0.58, BOARD_H_MM * 0.72),  # buzzer away from RF/header/analog
+        # Keep antenna on the top-right edge.
+        "J5": (BOARD_W_MM - 5.5, 8.5),
+        # E-ink FPC pulled off edge
+        "J2": (BOARD_W_MM - 13, BOARD_H_MM * 0.52),
+        # Load cell header inset and raised further
+        "J1": (20, BOARD_H_MM * 0.52),
+        # USB-C: centered on the bottom short edge for dev power/debug.
+        "J3": (BOARD_W_MM * 0.50, BOARD_H_MM - 9),
+        # USB-UART bridge placed close to the USB connector.
+        "U5": (BOARD_W_MM * 0.50, BOARD_H_MM - 36),
+        # USB OR-ing diode kept near the USB connector.
+        "D3": (BOARD_W_MM * 0.65, BOARD_H_MM - 24),
+        "C4": (BOARD_W_MM * 0.55, BOARD_H_MM - 24),
+        # LDO regulator kept with other power passives away from edges.
+        "U4": (BOARD_W_MM * 0.60, BOARD_H_MM - 30),
+        # USB CC resistors inset from the edge, grouped with USB power path.
+        "R5": (BOARD_W_MM * 0.58, BOARD_H_MM - 16),
+        "R6": (BOARD_W_MM * 0.64, BOARD_H_MM - 16),
+        # Decoupling caps kept close to their IC domains.
+        "C1": (BOARD_W_MM * 0.20, BOARD_H_MM * 0.50),
+        "C2": (BOARD_W_MM * 0.24, BOARD_H_MM * 0.54),
+        "C3": (BOARD_W_MM * 0.50, BOARD_H_MM - 26),
+        # Battery JST kept on the bottom edge but offset to avoid the USB connector.
+        "BT1": (BOARD_W_MM * 0.30, BOARD_H_MM - 16),
+        # Battery boost parts kept near the battery connector.
+        "U3": (BOARD_W_MM * 0.45, BOARD_H_MM - 22),
+        "L1": (BOARD_W_MM * 0.52, BOARD_H_MM - 22),
+        "D2": (BOARD_W_MM * 0.40, BOARD_H_MM - 26),
+        # HX711 (load cell ADC) kept mid-left but off the RF can.
+        "U2": (BOARD_W_MM * 0.26, BOARD_H_MM * 0.40),
+        # Sense divider grouped close to HX711/load-cell domain.
+        "R1": (BOARD_W_MM * 0.18, BOARD_H_MM * 0.54),
+        "R2": (BOARD_W_MM * 0.25, BOARD_H_MM * 0.52),
+        # Buzzer pushed to the upper-right away from RF, USB, and debug connectors.
+        "BZ1": (BOARD_W_MM * 0.85, BOARD_H_MM * 0.20),
+        # Aux header on edge; user button inset with more clearance.
+        "J4": (BOARD_W_MM - 6, BOARD_H_MM * 0.70),
+        "SW1": (BOARD_W_MM * 0.18, BOARD_H_MM * 0.24),
+        # USB-side PMOS kept near the USB power path but off the edge.
+        "Q1": (BOARD_W_MM * 0.58, BOARD_H_MM - 20),
+        # NMOS for e-ink power gating kept mid-right with clearance.
+        "Q2": (BOARD_W_MM * 0.70, BOARD_H_MM * 0.62),
+        # USB-side gate bias resistor kept with the PMOS but off the MCU cluster.
+        "R3": (BOARD_W_MM * 0.70, BOARD_H_MM - 14),
+        # LED/buzzer resistor pulled toward the user interface corner.
+        "R4": (BOARD_W_MM * 0.78, BOARD_H_MM * 0.32),
+        # Status LED clustered with its resistor in the UI corner.
+        "D1": (BOARD_W_MM * 0.74, BOARD_H_MM * 0.38),
     }
     fixed_targets = {}
     fixed_refs = set()
@@ -287,7 +331,7 @@ def auto_place(board, footprints, nets):
     rf_refs = {"U1", "J5"}
     analog_refs = {"U2", "J1", "C1", "C2"}
     power_refs = {"U3", "U4", "J3", "BT1", "L1", "D2", "D3", "R5", "R6", "C3"}
-    digital_core = {"JDBG1", "J4", "J2", "Q2", "BZ1", "SW1", "D1", "R4"}
+    digital_core = {"J4", "J2", "Q2", "BZ1", "SW1", "D1", "R4"}
 
     # Compute connectivity weight to cluster remaining parts
     conn = {ref: 0 for ref in ref_to_fp}
@@ -342,7 +386,7 @@ def auto_place(board, footprints, nets):
     slots = [(cx, cy) for cy in ys for cx in xs]
     # Keep slots away from fixed anchors to avoid immediate clashes.
     slot_keep = []
-    keep_radius = mm(7)
+    keep_radius = mm(12)  # Increased from 7mm to 12mm to avoid connector collisions
     for cx, cy in slots:
         ok = True
         for ref in fixed_refs:
@@ -392,7 +436,7 @@ def auto_place(board, footprints, nets):
         clamp_fp(fp)
 
     # Overlap repulsion + clamping (do not move fixed anchors).
-    reps = 18
+    reps = 50  # Increased from 18 to 50 for better convergence
     for _ in range(reps):
         moved = False
         for i, fp_a in enumerate(footprints):
@@ -413,13 +457,13 @@ def auto_place(board, footprints, nets):
                         continue
 
                     if overlap_x < overlap_y:
-                        step = mm(6)
+                        step = mm(10)
                         sign = -1 if axc < bxc else 1
                         dx_a = sign * step if move_a else 0
                         dx_b = -sign * step if move_b else 0
                         dy_a = dy_b = 0
                     else:
-                        step = mm(6)
+                        step = mm(10)
                         sign = -1 if ayc < byc else 1
                         dy_a = sign * step if move_a else 0
                         dy_b = -sign * step if move_b else 0
@@ -520,6 +564,10 @@ def build_board(sch_path: Path, out_path: Path):
     board_w_mm, board_h_mm, fixed_targets = auto_place(board, footprints, nets)
     if not verify_placement(board_w_mm, board_h_mm, footprints, fixed_targets):
         raise SystemExit(2)
+    # Keep reference designators visible on silkscreen for assembly/debug.
+    for fp in footprints:
+        ref = fp.Reference()
+        ref.SetLayer(pcbnew.F_SilkS)
     pcbnew.SaveBoard(str(out_path), board)
     print(f"Wrote board to {out_path}")
 

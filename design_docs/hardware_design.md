@@ -1,160 +1,112 @@
-# Hardware Design & Specification
+# Hardware Design (Current Plan)
 
-## 1. System Compatibility & Role
-*   **Device Type:** LoRaWAN Class A End-Node.
-*   **Connectivity:** Sub-1GHz RF (Talks to the Gateway).
-*   **Gateway Compatibility:** Compatible with standard LoRaWAN 1.0.3 Gateway **RAK7268V2**.
-    *   *Note:* This device functions identically whether the Gateway is connected via **PoE (Ethernet)** or **Wi-Fi**.
+This document is the *current* hardware plan used by the programmatic KiCad generators in `tools/`. It replaces earlier drafts that assumed a PCB‑mounted AA holder and large debug headers.
 
-## 2. Chip Selection & Justification
+## Recent schematic/PCB updates
+- **USB-C is now the single development connector**: full USB2 D+/D- feed an on‑board STM32F042 acting as USB CDC (UART) + CMSIS‑DAP SWD.
+- **CH340C removed; STM32F042F6P6 replaces it** to provide both UART console and SWD/JTAG‑style debug over the same cable (3.3 V powered, with local decoupling).
+- **Field power is via a 2‑wire JST‑PH** feeding the TPS61220 boost and Schottky OR-ing with the USB LDO.
 
-### A. Core Microcontroller / RF: **RAK3172 (STM32WLE5)**
-*   **Why:** The STM32WLE5 is the world's first SoC with integrated LoRaWAN radio. The RAK3172 module packages this chip with necessary RF matching and regulatory certification (FCC/CE/etc.), drastically reducing design complexity and cost.
-*   **Key Specs:** ARM Cortex-M4, Sub-1GHz Radio, Ultra-low power (< 2uA in sleep).
-*   **Cost:** ~$6-7 USD per module.
+## 1. System Role
+- **Device:** LoRaWAN Class‑A end node
+- **Connectivity:** Sub‑1 GHz LoRa (RAK3172 module)
+- **UI:** 2.13" e‑paper (SSD1680) connected by FPC cable; local button + buzzer + status LED
+- **Power:** USB‑C for development power; external battery pack for field deployment (2‑wire JST)
 
-### B. Sensor Interface: **HX711 (24-Bit ADC)**
-*   **Why:** The industry standard for resistive load cells. It includes a built-in preamplifier (gain 128), essential for the millivolt-level signals from strain gauges.
-*   **Key Specs:** 24-bit resolution, 2.6-5.5V operation, 2-wire digital interface.
-*   **Sensor Compatibility:** Perfectly suited for **TE FX1901 Compression Load Cell**.
-    *   **Output:** 20mV/V nominal.
-    *   **Bridge Resistance:** 2400Ω (Typ).
-    *   **Current Draw:** ~1.4mA at 3.3V Excitation.
-*   **Cost:** < $0.50 USD.
+## 2. External Interfaces (Connectors)
+- **USB‑C (Dev)**: single connector for development **power + console + flashing**
+  - Power: `VBUS` (5 V) into an LDO → 3.3 V
+  - Data: USB2 D+/D‑ into **STM32F042F6P6** (USB CDC + CMSIS‑DAP SWD)
+  - Flashing: via STM32 UART bootloader over the USB CDC path (requires `BOOT0` + reset access; see `design_docs/firmware_design.md`)
+  - SWD/JTAG: kept as **optional** pogo‑pad footprint (preferred) rather than a large 2.54 mm header
+- **Battery (Field)**: 2‑wire JST‑PH (`BAT`, `GND`) to an external battery case/pack
+- **Load Cell**: 4‑wire header (`E+`, `E-`, `A+`, `A-`) into HX711
+- **Display**: 24‑pin 0.5 mm FPC connector for the GDEY0213B74 flex cable
+- **Antenna**: u.FL/I‑PEX RF connector near the RAK3172 RF pin (short 50 Ω trace)
 
-### C. Power Management:
-*   **Boost Converter:** **TI TPS61021A** to boost 2x AA (1.8V-3.0V) to stable 3.3V for the Load Cell.
-*   **Power Gating:** **SI2301 (P-Channel MOSFET)** to cut power to the HX711 and Load Cell during sleep. This eliminates the quiescent current of the HX711 (<1uA) and the bridge excitation current (**~1mA** for the specified FX1901 2.4kΩ-3.6kΩ bridge).
-*   **Battery Sense:** Voltage divider (**1MΩ / 1MΩ**) connected to **PB4 (ADC)** to monitor battery health.
+## 3. Key Silicon & Roles
+### A. MCU + RF: RAK3172 (STM32WLE5)
+- Integrated LoRa radio; certified module reduces RF risk.
 
-### D. User Interface
-*   **Display:** **Good Display GDEY0213B74** (2.13", 250x122, SSD1680 Driver). SPI Interface.
-*   **Audio:** **CPT-9019S Piezo Transducer** driven by **2N7002 (N-Channel MOSFET)** for louder sound/safety. Driven by MCU PWM.
-*   **LED:** Simple Status LED (Red) for boot/error indication.
-*   **Button:** Single User Button for interaction.
-    *   **Short Press (<2s):** Tare / Zero Scale.
-    *   **Long Press (>2s):** Toggle Measurement Range (Standard 2000mL vs Extended).
+### B. Load cell ADC: HX711 (SOIC‑16)
+- 24‑bit ADC with PGA; reads strain gauge bridge.
+- `HX_VCC` is **power‑gated** during sleep to eliminate bridge + HX711 draw.
 
----
+### C. Power
+- **Battery boost (field):** TI **TPS61220** (wide VIN, 3.3 V rail generation).
+- **USB LDO (dev power):** Microchip **MIC5504‑3.3** from `VBUS` → 3.3 V.
+- **Power ORing:** Schottky diodes into the system rail `VCC` (one from battery boost, one from USB LDO).
+- **Battery sense:** 1 MΩ / 1 MΩ divider from `BAT` to ADC (`BAT_SENSE`) so firmware can report battery health even when on USB power.
 
-## 2. Wiring & Schematic Concept
+### D. USB Console + Debug Bridge
+- **STM32F042F6P6** provides USB CDC (console/logs, UART bootloader access) and CMSIS‑DAP SWD over the same USB‑C connector. Target SWDIO/SWCLK/NRST and UART2 RX/TX are wired to this bridge and also brought out to the pogo/debug header.
 
-### Power Tree & Voltage Rails
-*   **RAK3172 Input Range:** 2.0V to 3.6V.
-*   **Regulation Target:** **3.3V** (via TPS61021A Boost or XC6220B331MR LDO).
-*   **Safety & OR-ing Logic:**
-    *   **Mechanism:** Dual **SS14 Schottky Diodes**.
-    *   **Safety Calculation (Temp -20°C to +60°C):**
-        *   **Cold / High Load:** Vf increases ≈ 0.4V -> Net VDD = 3.3V - 0.4V = **2.9V** (> 2.0V Min Limit).
-        *   **Hot / Low Load:** Vf decreases ≈ 0.15V -> Net VDD = 3.3V - 0.15V = **3.15V** (< 3.6V Max Limit).
-    *   **Conclusion:** The rail is strictly constrained within the safe operating window under all environmental conditions.
+## 4. Pin Mapping (Summary)
+### A. RAK3172 → System
+| RAK3172 Pin | Net | Function | Notes |
+|---:|---|---|---|
+| 1 | `UART2_RX` | console RX | From USB bridge (STM32F042) TXD |
+| 2 | `UART2_TX` | console TX | To USB bridge (STM32F042) RXD |
+| 3 | `HX711_DT` | HX711 data | `PA15` |
+| 4 | `HX711_SCK` | HX711 clock | `PB6` (must be LOW before gating) |
+| 6 | `EINK_DC` | E‑ink D/C | `PA1` |
+| 7 | `SWDIO` | SWD IO | optional pogo pads |
+| 8 | `SWCLK` | SWD CLK | optional pogo pads |
+| 9 | `I2C_SCL` | I2C | expansion |
+| 10 | `I2C_SDA` | I2C | expansion |
+| 13 | `EINK_MOSI` | SPI MOSI | `PA7` |
+| 15 | `EINK_SCK` | SPI SCK | `PA5` |
+| 16 | `EINK_CS` | SPI CS | `PA4` |
+| 19 | `BUZZ_PWM` | buzzer PWM | `PA8` |
+| 26 | `LED_STATUS` | status LED | `PB2` |
+| 27 | `EINK_RST` | e‑ink reset | `PB12` |
+| 29 | `EINK_BUSY` | e‑ink busy | `PA0` |
+| 30 | `HX_GATE` | HX gate | drives SI2301 |
+| 31 | `BAT_SENSE` | battery ADC | divider from `BAT` |
+| 32 | `BTN_USER` | button | active‑low |
 
-### Pin Mapping (RAK3172 Module - 32-Pin Stamp)
+### B. STM32F042F6 (USB Bridge) → System
+| STM32F042 Pin | Net | Function | Notes |
+|---:|---|---|---|
+| 16 / VDDA | `VCC` | 3.3 V | shared decoupling with C4 |
+| 15 / VSSA | `GND` | ground | analog/digital common |
+| 17 / PA11 | `USB_DM` | USB D– | to J3 |
+| 18 / PA12 | `USB_DP` | USB D+ | to J3 |
+| 19 / PA13 | `SWDIO` | target SWDIO | feeds RAK3172 / pogo |
+| 20 / PA14 | `SWCLK` | target SWCLK | feeds RAK3172 / pogo |
+| 14 / PB1  | `NRST`  | target reset | drives module reset |
+| 8  / PA2  | `UART2_RX` | UART TX to RAK | bridge → target |
+| 9  / PA3  | `UART2_TX` | UART RX from RAK | target → bridge |
+| 4  / NRST | `NRST` | MCU reset | pulled up, brought to USB-C reset strap |
 
-| RAK3172 Pin | Pin Name | Function | Connection |
-| :--- | :--- | :--- | :--- |
-| **1** | PA3 | UART2_RX | Debug/Log RX |
-| **2** | PA2 | UART2_TX | Debug/Log TX |
-| **3** | PA15 | GPIO | **HX711 DT** (Data) |
-| **4** | PB6 | GPIO | **HX711 SCK** (Clock) |
-| **6** | PA1 | GPIO | **E-Ink D/C** (Data/Command) |
-| **13** | PA7 | SPI1_MOSI | **E-Ink MOSI** |
-| **15** | PA5 | SPI1_SCK | **E-Ink SCK** |
-| **16** | PA4 | SPI1_NSS | **E-Ink CS** |
-| **19** | PA8 | PWM | **Buzzer Driver** (Gate of 2N7002) |
-| **26** | PB2 | GPIO | **Status LED** |
-| **27** | PB12 | GPIO | **E-Ink RST** (Note: Internal Pull-Up/Down) |
-| **29** | PA0 | GPIO | **E-Ink BUSY** |
-| **30** | PB5 | GPIO | **Power Gate** (Gate of SI2301) |
-| **31** | PB4 | ADC_IN | **Battery Sense** (1MΩ/1MΩ Divider) |
-| **32** | PB3 | GPIO | **User Button** (Short: Tare, Long: Toggle Range) |
-| **-** | - | Power In | **USB-C VBUS** (Connects to XC6220) |
+### C. Connectors (External)
+| Ref | Pins | Nets | Purpose |
+|---|---|---|---|
+| J3 | USB‑C | `VBUS`, `USB_DP`, `USB_DM`, `CC1`, `CC2`, `GND` | Dev power + CDC + CMSIS‑DAP |
+| J1 | 1x4 | `E+`, `E-`, `A+`, `A-` | Load cell |
+| J2 | 24‑pin FPC | SPI + HV rails | E‑ink flex |
+| J4 | 1x05 | `GND`, `VCC`, `I2C_SCL`, `I2C_SDA`, `BOOT0` | Minimal breakout |
+| J5 | u.FL | RF feed | Antenna |
+| BT1 | JST‑PH‑2 | `BAT`, `GND` | Battery input |
 
-### E-Ink Display Pinout (GDEY0213B74)
-*   **Bias Generation:** The external booster (**Inductor L1, MOSFET Si1308EDL, Diodes MBR0530**) generates the high-voltage drive rails from the 3.3V supply.
-    *   **Required Voltages (Source: SSD1680 Datasheet P.41 Table 11-2):**
-        *   **VGH:** +20V (Typ)
-        *   **VGL:** -20V (Derived, VGL = -VGH)
-        *   **VSH1:** +15V (Typ)
-        *   **VSH2:** +5V (Typ)
-        *   **VSL:** -15V (Typ)
-        *   **VCOM:** -2V (Typ)
-    *   **Safety:** These voltages are generated *inside* the display module's power loop and do not expose the MCU or main VDD rail to >3.6V.
+## 5. E‑Ink Display Notes (GDEY0213B74 / SSD1680)
+- The PCB hosts only the **24‑pin FPC connector**; the display module mounts elsewhere in the enclosure and connects via the flex cable.
+- SPI interface uses `BUSY/RES#/D/C#/CS#/SCL/SDA` and `BS1` strapped for 4‑wire SPI.
+- The SSD1680 requires an **external booster/regulator application circuit** (inductor + MOSFET + Schottky diodes + capacitors) for the HV rails. Reference:
+  - `datasheets/GDEY0213B74.pdf` (module reference circuit)
+  - `datasheets/SSD1680.pdf` (Section 6.3 “Booster & Regulator”)
+- Layout requirements (important):
+  - Place the HV booster parts and HV capacitors **right next to the FPC connector**.
+  - Keep the switching loop (L + MOSFET + diodes) **extremely small**.
+  - Keep the HV area away from HX711 analog inputs and away from the RF feed.
 
-| Pin | Name | Function | Connection |
-| :--- | :--- | :--- | :--- |
-| 1 | NC | No Connect | - |
-| 2 | GDR | Gate Drive | **Si1308EDL Gate** |
-| 3 | RESE | Source Drive | **2.2Ω Resistor** to GND (Current Sense) |
-| 4 | NC | No Connect | - |
-| 5 | VSH2 | Source High | **4.7uF/25V** Cap to GND (**+15V**) |
-| 6 | TSCL | Temp Clock | NC (Internal Sensor Used) |
-| 7 | TSDA | Temp Data | NC (Internal Sensor Used) |
-| 8 | BS1 | Bus Select | **GND** (4-Wire SPI) |
-| 9 | BUSY | Busy | MCU **PA0** |
-| 10 | RES# | Reset | MCU **PB12** |
-| 11 | D/C# | Data/Cmd | MCU **PA1** |
-| 12 | CS# | Chip Select | MCU **PA4** |
-| 13 | SCL | Clock | MCU **PA5** |
-| 14 | SDA | MOSI | MCU **PA7** |
-| 15 | VDDIO | IO Power | **VDD_RAK** (~3.0V) |
-| 16 | VCI | Logic Power | **VDD_RAK** (~3.0V) |
-| 17 | VSS | Ground | **GND** |
-| 18 | VDD | Core Volt | **1uF** Cap to GND |
-| 19 | VPP | OTP Power | NC (or 1uF Cap) |
-| 20 | VSH1 | Source High | **1uF/25V** Cap to GND (**+15V**) |
-| 21 | VGH | Gate High | **1uF/25V** Cap to GND (**+20V**) |
-| 22 | VSL | Source Low | **1uF/25V** Cap to GND (**-15V**) |
-| 23 | VGL | Gate Low | **1uF/25V** Cap to GND (**-20V**) |
-| 24 | VCOM | VCOM | **1uF/25V** Cap to GND |
+## 6. PCB Placement Priorities (Professional Layout)
+- **USB edge:** USB‑C centered on a short edge; STM32F042 bridge + LDO close to it; keep copper for heat spreading.
+- **Analog corner:** Load cell connector + HX711 + its decoupling close together; keep noisy switching/HV away.
+- **RF edge:** RAK3172 near top edge with u.FL near RF pin; short 50 Ω feed; ground stitching.
+- **Display edge:** FPC connector on board edge to simplify cable routing; HV caps clustered next to pins.
+- **Silkscreen:** keep `U* / R* / C* / J*` reference designators visible on `F.SilkS` (assembly‑friendly).
 
-**Reference Circuit Note:** The GDEY0213B74 requires an external booster circuit (Reference: Datasheet Section 12).
-*   **Inductor:** 47uH (L1).
-*   **MOSFET:** Si1308EDL (Q1).
-*   **Diode:** MBR0530 (D1-D3).
-*   **Resistor:** 2.2Ω (R2) for current sense.
-*   **Capacitors:** 1uF/25V (C5-C12) and 4.7uF/25V (C4).
-
-### Buzzer Driver Note
-*   **Component:** 2N7002 (N-Channel MOSFET).
-*   **Sizing:** Rds(on) ~7.5Ω @ Vgs=2.5V. Load current (Piezo) < 20mA. Voltage drop < 0.15V. Sufficient for 3V drive.
-
-### Critical Design Note: Power Gating
-*   **Power Cut:** When the P-Channel MOSFET cuts power to the HX711 (VCC = 0V), the MCU **MUST** set the `HX711 SCK` pin to **LOW** (or High-Z with pull-down) before sleeping.
-*   **Why:** If SCK is High while HX711 VCC is 0V, current will flow through the SCK ESD protection diode into the HX711's internal power rail, causing "Ghost Powering" and draining the battery.
-
-### Load Cell to HX711
-*   **Sensor:** **TE FX1901-0001-0025-L** (25lbf / 11kg).
-*   **Saturation Limitation:** The FX1901 Full Scale output (~66mV) exceeds the HX711 Gain 32 input range (+/- 51.5mV).
-    *   **Impact:** Measurement will be **clamped/saturated at approximately 8.5kg**.
-    *   **Acceptance:** This is acceptable as the primary application (Urine Bag) volume is 0-2000mL (2kg), well within the linear range.
-*   **Wiring:**
-    *   **Red (Excitation +):** Connected to **Switched 3.3V** (via MOSFET)
-    *   **Black (Excitation -):** Connected to GND
-    *   **Green (Signal +):** HX711 INB+
-    *   **White (Signal -):** HX711 INB-
-
----
-
-## 3. PCB Design Guidelines
-
-### A. RF Section (Crucial)
-*   **Antenna Path:** Keep the trace from the RAK3172 RF pin to the antenna connector (IPEX or SMA) as short as possible.
-*   **Impedance:** Use a calculator to ensure the RF trace is **50 Ohms**.
-*   **Ground Plane:** Solid ground plane under the module, *except* under the antenna area if using a PCB antenna. Use plenty of stitching vias.
-
-### B. Analog Section (HX711)
-*   **Isolation:** Place the HX711 and its capacitors as close to the load cell connector as possible.
-*   **Separation:** Keep digital traces (SCK/DT) away from the analog input traces (E+/E-/A+/A-) to avoid noise coupling.
-*   **Power:** Use a dedicated decoupling capacitor (10uF + 0.1uF) right next to the HX711 VCC pin.
-
-### C. Power Routing
-*   **VCC Trace:** Use at least 0.5mm width for main 3.3V lines.
-*   **GND:** Use a "Star Ground" topology if possible, or a solid Ground Plane (Bottom Layer) for the entire board.
-*   **Decoupling:** Place 0.1uF capacitors **immediately** next to the VCC pins of the RAK3172 and HX711.
-
-### D. E-Ink Booster & High Voltage
-*   **Switching Loop:** The connection between the Inductor (L1), MOSFET (Q1), and Diodes (D1-D3) switches at high frequency. Keep this loop **extremely small** to minimize EMI.
-*   **High Voltage Caps:** The capacitors for VGH, VGL, VSH, VSL (+/-20V, +/-15V) must be rated for **25V** minimum.
-*   **Placement:** Place these capacitors as close as possible to the FPC connector pins to stabilize the drive voltages.
-*   **Isolation:** Keep these noisy switching signals away from the sensitive Analog (HX711) and RF sections.
+## 7. Known Issues / TODO
+- Implement the SSD1680/GDEY0213B74 HV booster circuit in the schematic generator (currently some HV pins are stubbed as NC).
+- Ensure `BAT_SENSE` measures the battery input (`BAT`) and not the post-OR system rail (`VCC`).

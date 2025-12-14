@@ -1,65 +1,42 @@
-# Detailed Bill of Materials (BOM)
+# Detailed Bill of Materials (Current Plan)
+
+This BOM reflects the *current* architecture: **USB‑C + STM32F042 bridge** for development (power + console + CMSIS‑DAP SWD / UART bootloader), **JST 2‑wire battery connector** for field deployment, and a **24‑pin FPC connector** for the e‑paper cable.
 
 ## 1. Core Electronics (PCBA)
 
-| Item | Manufacturer | Part Number | Description | Qty | Unit Cost (Est.) | Source |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **MCU + LoRa SoC** | RAKwireless | **RAK3172** | STM32WLE5 Module, Sub-1GHz, IPEX, SMD | 1 | $6.00 | [RAK Store](https://store.rakwireless.com/products/rak3172-wisduo-lpwan-module) |
-| **ADC (Load Cell)** | Avia Semiconductor | **HX711** | 24-Bit Analog-to-Digital Converter (SOIC-16) | 1 | $0.50 | DigiKey / LCSC |
-| **Display** | Good Display | **GDEY0213B74** | 2.13" E-Paper, 250x122, SPI, SSD1680 Driver | 1 | $4.50 | [Good Display](https://www.good-display.com/) |
-| **Buzzer** | CUI / Generic | **CPT-9019S** | Piezo Transducer, SMD or TH, 3V-25V Drive | 1 | $0.30 | DigiKey |
-| **Buzzer Driver** | OnSemi / Generic | **2N7002** | N-Channel MOSFET (SOT-23) | 1 | $0.05 | DigiKey |
-| **Power Gate** | Vishay / Generic | **SI2301** | P-Channel MOSFET (SOT-23) | 1 | $0.10 | DigiKey |
-| **Power Management** | Texas Instruments | **TPS61220DCKR** | Boost Converter (SOT-23-6) used in current schematic | 1 | $0.40 | DigiKey |
-| **Wall Power LDO** | Microchip | **MIC5504-3.3YM5-TR** | 3.3V LDO (SOT-23-5) used in current schematic | 1 | $0.35 | DigiKey |
-| **Power Connector** | Generic | **USB Type-C** | 16-pin Power Only Receptacle, SMD | 1 | $0.40 | LCSC / DigiKey |
-| **Power Diode** | OnSemi | **SS14** | Schottky Diode (Low Vf) for OR-ing | 2 | $0.10 | DigiKey |
-| **Battery Holder** | Keystone | **1028** | Holder for 2x AA Cells, PCB Mount | 1 | $1.20 | DigiKey |
-| **Antenna** | Molex | **1461530050** | Flex Internal Antenna, 868/915MHz, IPEX | 1 | $1.50 | DigiKey |
-| **User Button** | C&K | **PTS645** | Tactile Switch, 6mm | 1 | $0.20 | DigiKey |
-| **LED** | Cree | **SMD 0603** | Red/Green Status LED | 2 | $0.05 | DigiKey |
-| **Passive Components** | Yageo / Murata | **0402/0603** | Resistors, Caps (10uF, 0.1uF, 1uF) | ~35 | $1.30 | DigiKey |
-| **E-Ink Booster** | Various | **Booster Kit** | 47uH (CDRH2D18), Si1308EDL, 3x MBR0530 | 1 | $0.80 | DigiKey |
-| **PCB** | JLCPCB / PCBWay | **Custom** | 2-Layer FR4, 1.6mm, Green Solder Mask | 1 | $2.00 | JLCPCB |
+| Block | Part | Manufacturer | Part Number | Notes / Datasheet |
+|---|---|---|---|---|
+| MCU + LoRa | RAK3172 module | RAKwireless | RAK3172 | `datasheets/RAK3172_C19723904.pdf` |
+| Load cell ADC | HX711 | Avia | HX711 | `datasheets/hx711.pdf` |
+| E‑paper display | GDEY0213B74 | Good Display | GDEY0213B74 | `datasheets/GDEY0213B74.pdf` |
+| E‑paper connector | 24‑pin 0.5 mm FPC | TE Connectivity | 2‑1734839‑4 | `datasheets/TE_2-1734839-4_C3168150.pdf` |
+| USB connector | USB‑C receptacle (dev power/console/boot) | HRO | TYPE‑C‑31‑M‑12 | `datasheets/HRO_TYPE-C-31-M-12_C165948.pdf` |
+| USB bridge | STM32F042F6P6 (USB CDC + CMSIS‑DAP SWD) | ST | STM32F042F6P6 | `https://www.st.com/resource/en/datasheet/stm32f042f6.pdf` |
+| USB LDO | 3.3 V LDO | Microchip | MIC5504‑3.3YM5 | `datasheets/MIC5504.pdf` |
+| Battery boost | boost converter | TI | TPS61220DCKR | `datasheets/TPS61220.pdf` |
+| Rail ORing | Schottky diode | onsemi (or equiv) | SS14 | `datasheets/SS14.pdf` (x2) |
+| Battery connector | JST‑PH 2‑pin (field battery harness) | JST | S2B‑PH‑SM4‑TB | `datasheets/JST_S2B-PH-SM4-TB_C295747.pdf` |
+| RF connector | u.FL / I‑PEX | Hirose | U.FL‑R‑SMT‑1 | `datasheets/U.FL-R-SMT-1_C88373.pdf` |
+| HX power gate | P‑MOSFET | Vishay | SI2301CDS | `datasheets/SI2301CDS-T1-GE3_C10487.pdf` |
+| Buzzer driver | N‑MOSFET | onsemi (or equiv) | 2N7002 | `datasheets/2N7002LT1G_C16338.pdf` |
+| Buzzer | magnetic SMD | CUI | CMT‑8504‑100‑SMT | (KiCad footprint: `Buzzer_Beeper:MagneticBuzzer_CUI_CMT-8504-100-SMT`) |
+| Button | tactile switch | C&K | PTS645 | `datasheets/pts645.pdf` |
+| LED | 0603 red | generic | LED 0603 red | (assembly‑friendly footprint) |
+| Passives | R/C/L | generic | 0603 | values per schematic |
 
-**Total PCBA Cost:** ~$20.20
+## 2. E‑Paper HV Booster (Required for SSD1680)
 
----
+The SSD1680 requires an external booster/regulator application circuit (inductor + MOSFET + diodes + capacitors) for the HV rails. Reference:
+- `datasheets/SSD1680.pdf` (Section 6.3 “Booster & Regulator”)
+- `datasheets/GDEY0213B74.pdf` (module reference circuit)
 
-## 2. Sensor & Mechanical Components
+Recommended parts (package choices are driven by availability and placement near the FPC connector):
+- **Inductor:** 47 µH (≥500 mA), SMD (size TBD; avoid 0603 for this value/current)
+- **MOSFET:** Si1308EDL (SOT‑323)
+- **Schottky diodes:** MBR0530 (SOD‑123) ×3
+- **Sense resistor:** 2.2 Ω
+- **Caps:** 4.7 µF / 25 V and 1 µF / 25 V (multiple, per reference circuit)
 
-| Item | Specifications | Description | Qty | Unit Cost (Est.) |
-| :--- | :--- | :--- | :--- | :--- |
-| **Force Sensor** | 25lbf (~11kg) | **FX1901-0001-0025-L** Compression Load Cell | 1 | $16.50 |
-| **Enclosure** | Custom Injection Mold / 3D Print | ABS/ASA Plastic, IP65 Design, White | 1 | $4.00 |
-| **Bed Rail Hook** | Stainless Steel / ABS | Universal Clamp or Hook (Fits 0.8"-1.5" rails) | 1 | $2.50 |
-| **Carabiner/Hook** | Stainless Steel | To hang the urine bag on the load cell | 1 | $1.00 |
-| **Screws/Fasteners** | M3 / M4 Stainless | For mounting PCB and Load Cell | Set | $0.50 |
-| **Gasket** | Silicone | For IP65 sealing of enclosure halves | 1 | $0.50 |
-
-**Total Mechanical Cost:** ~$25.00
-
----
-
-## 3. Gateway Infrastructure (Per Ward)
-
-| Item | Manufacturer | Part Number | Description | Qty | Unit Cost |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **LoRaWAN Gateway** | RAKwireless | **RAK7268V2** | WisGate Edge Lite 2 (Indoor, 8-ch, Wi-Fi/Eth, PoE) | 1 | $150.00 |
-| **Mounting Kit** | Generic | - | Wall mount screws/anchors | 1 | $5.00 |
-| **Power Adapter (Opt.)** | Generic | **12V / 1A** | **Required for Wi-Fi Line install** (if PoE unavailable) | 1 | $5.00 |
-
-**Total Infrastructure Cost:** ~$155.00 - $160.00
-*Note: Gateway is a purchased finished product (COTS). No custom PCB design is required for the Gateway.*
-
----
-
-## 4. Total Unit Cost Estimate (Mass Production > 1k units)
-
-| Category | Prototype Cost (1 Unit) | Mass Production Cost (Est.) |
-| :--- | :--- | :--- |
-| **PCBA** | $20.20 | $15.00 |
-| **Mechanical** | $25.00 | $18.00 |
-| **Assembly & Testing** | $3.00 | $3.00 |
-| **Packaging** | $1.00 | $1.00 |
-| **TOTAL DEVICE** | **~$49.20** | **~$37.00** |
+## 3. Mechanical / Off‑Board
+- **Battery pack:** housed in a separate battery case; connects to the PCB via JST‑PH 2‑wire cable.
+- **Display module:** mounted in the enclosure front; connects to the PCB via the 24‑pin FPC cable.

@@ -6,12 +6,12 @@ from pathlib import Path
 # Key: Value from Schematic (or Reference prefix)
 # Value: (Manufacturer, Part Number, LCSC Part #)
 BOM_MAPPING = {
-    "RAK3172": ("RAKwireless", "RAK3172", ""),
+    "RAK3172": ("RAKwireless", "RAK3172", "C19723904"),
     "HX711": ("Avia Semiconductor", "HX711", ""),
     "TPS61220": ("Texas Instruments", "TPS61220DCKR", ""),
     "MIC5504-3.3": ("Microchip", "MIC5504-3.3YM5-TR", ""),
-    "SI2301": ("Vishay", "SI2301CDS-T1-GE3", ""),
-    "2N7002": ("OnSemi", "2N7002", ""),
+    "SI2301": ("Vishay", "SI2301CDS-T1-GE3", "C10487"),
+    "2N7002": ("OnSemi", "2N7002", "C16338"),
     "SS14": ("OnSemi", "SS14", ""),
     "RED": ("Cree", "LED Red 0603", ""), # Generic
     "10uF": ("Yageo", "CC0603KRX7R9BB106", ""), # Example generic 0603 10uF
@@ -19,11 +19,13 @@ BOM_MAPPING = {
     "4.7uH": ("Murata", "LQM18PN4R7MFRD", ""), # Example generic 0603 inductor
     "Buzzer": ("CUI", "CPT-9019S", ""),
     "LoadCell": ("Generic", "Header 1x4", ""),
-    "EInk_FPC": ("TE Connectivity", "2-1734839-4", ""), # Connector for GDEY0213B74
+    "EInk_FPC": ("TE Connectivity", "2-1734839-4", "C3168150"), # Connector for GDEY0213B74
     "USB-C_Power": ("HRO", "TYPE-C-31-M-12", "C165948"),
+    "USB-C_Dev": ("HRO", "TYPE-C-31-M-12", "C165948"),
+    "STM32F042F6P6 (USB CDC + CMSIS-DAP)": ("ST", "STM32F042F6P6", ""),  # LCSC varies; fill if stocked
     "USER_BTN": ("C&K", "PTS645", ""),
-    "BAT_JST": ("JST", "S2B-PH-SM4-TB", ""),
-    "Antenna_UFL": ("Hirose", "U.FL-R-SMT-1", ""),
+    "BAT_JST": ("JST", "S2B-PH-SM4-TB", "C295747"),
+    "Antenna_UFL": ("Hirose", "U.FL-R-SMT-1", "C88373"),
 }
 
 def process_bom():

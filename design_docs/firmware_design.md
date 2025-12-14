@@ -23,8 +23,19 @@ The firmware will be developed as a standard C/C++ project using the **STM32Cube
 │       ├── app_lorawan.c   # LoRaWAN Task/Callbacks
 │       ├── hx711_driver.c  # Bit-banged or SPI-based driver
 │       └── epd_driver.c    # SSD1680 E-Ink Driver
-└── tools/                  # Flashing/Debugging scripts (OpenOCD/JLink)
 ```
+
+## 1.1 Development & Flashing Interface (USB‑C)
+Hardware provides:
+- **USB power** on `VBUS`
+- **USB bridge MCU (STM32F042F6P6)** that exposes **USB CDC (UART2_TX/UART2_RX)** and **CMSIS‑DAP SWD** over the same cable.
+- **Primary dev path:** single USB‑C into the on‑board STM32 bridge (3.3 V). SWD is wired to the target pogo pads and to the bridge so you can use either the on‑board CMSIS‑DAP or an external probe.
+
+Recommended firmware/development flow:
+- **Console:** enable `USART2` and route `printf`/logs to UART2.
+- **Flashing:** use either (a) STM32 ROM bootloader over the USB CDC path (assert `BOOT0` + reset) or (b) SWD via the on‑board CMSIS‑DAP bridge.
+  - `BOOT0=1` + reset → ROM bootloader on UART
+  - `BOOT0=0` + reset → normal firmware
 
 ## 2. Operating Logic (State Machine)
 To ensure <2uA sleep current, the application will use the **STM32 Low Power Manager (LPM)** utility or a custom `EnterStopMode` routine.

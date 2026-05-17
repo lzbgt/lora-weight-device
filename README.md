@@ -1,5 +1,8 @@
 # Hospital Urine Bag Monitoring System (LoRaWAN)
 
+
+[![Paid_IoT_Review](https://img.shields.io/badge/Paid_IoT_Review-brightgreen)](https://x2.brucelu.top/iot/checkout/?source=github-badge-lora-weight-device) [![Ask_First](https://img.shields.io/badge/Ask_First-blue)](https://x2.brucelu.top/products/contact/?offer=iot&source=github-badge-lora-weight-device) [![Sample](https://img.shields.io/badge/Sample-informational)](https://x2.brucelu.top/iot/sample/)
+
 ## Project Overview
 A low-power, connected IoT device designed to automatically monitor urine output in hospital wards. It replaces manual visual checks with real-time digital logging, improving patient care and reducing nurse workload.
 

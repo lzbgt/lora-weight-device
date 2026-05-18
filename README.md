@@ -1,8 +1,5 @@
 # Hospital Urine Bag Monitoring System (LoRaWAN)
 
-
-[![Paid_IoT_Review](https://img.shields.io/badge/Paid_IoT_Review-brightgreen)](https://x2.brucelu.top/iot/checkout/?source=github-badge-lora-weight-device) [![Ask_First](https://img.shields.io/badge/Ask_First-blue)](https://x2.brucelu.top/products/contact/?offer=iot&source=github-badge-lora-weight-device) [![Sample](https://img.shields.io/badge/Sample-informational)](https://x2.brucelu.top/iot/sample/)
-
 ## Project Overview
 A low-power, connected IoT device designed to automatically monitor urine output in hospital wards. It replaces manual visual checks with real-time digital logging, improving patient care and reducing nurse workload.
 
@@ -49,14 +46,3 @@ Contains reference specifications for critical components:
 
 ## License
 Proprietary / Internal Company Use.
-
-## Commercial support
-
-For teams adapting this repo for ESP32, Bluetooth, Wi-Fi provisioning, LoRa/LoRaWAN, low-power sensing, gateway handoff, or prototype-to-pilot embedded device work, I offer a paid bring-up review:
-
-- Review page: https://x2.brucelu.top/iot/?source=github-lora-weight-device
-- Sample deliverable: https://x2.brucelu.top/iot/sample/
-- Checkout: https://x2.brucelu.top/iot/checkout/?source=github-lora-weight-device
-- Product catalog: https://x2.brucelu.top/products/?source=github-lora-weight-device
-
-Boundary: this is paid engineering review/support. It does not include medical/regulatory approval, guaranteed RF range, hardware repair, credential-managed operation, or custom firmware delivery.
